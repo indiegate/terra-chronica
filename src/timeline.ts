@@ -127,27 +127,62 @@ export class Timeline {
       track.append('text').attr('class', 'tick-label').attr('x', tx).attr('y', axisY + 16).text(label);
     }
 
-    // Events
-    this.svg
-      .append('g')
-      .attr('class', 'events')
+    // Events: a diamond where there is room, a thin tick where events crowd together.
+    // Hovering the event row picks the nearest event, so every one stays reachable.
+    const events = [...this.cfg.events].map((e) => ({ ...e, x: X(e.value) })).sort((a, b) => a.x - b.x);
+    let lastDiamond = -Infinity;
+    const marks = events.map((e, i) => {
+      const gapBefore = i > 0 ? e.x - events[i - 1].x : Infinity;
+      const gapAfter = i < events.length - 1 ? events[i + 1].x - e.x : Infinity;
+      const roomy = gapBefore >= 7 && gapAfter >= 7 && e.x - lastDiamond >= 7;
+      if (roomy) lastDiamond = e.x;
+      return { ...e, roomy };
+    });
+    const eventsG = this.svg.append('g').attr('class', 'events');
+    eventsG
       .selectAll('path')
-      .data(this.cfg.events)
+      .data(marks)
       .join('path')
-      .attr('class', 'event')
-      .attr('d', d3.symbol(d3.symbolDiamond, 20)())
-      .attr('transform', (d) => `translate(${X(d.value)},${axisY - 7})`)
-      .on('mouseenter', (_e: MouseEvent, d) => {
-        this.tip.innerHTML = `<em>${format(d.value)}</em> ${d.label}`;
+      .attr('class', (d) => (d.roomy ? 'event' : 'event tick-event'))
+      .attr('d', (d) => (d.roomy ? d3.symbol(d3.symbolDiamond, 20)() : `M0,-4V4`))
+      .attr('transform', (d) => `translate(${d.x},${axisY - 7})`);
+    const nearest = (px: number) => {
+      let best: (typeof marks)[number] | null = null;
+      for (const m of marks) if (Math.abs(m.x - px) <= 6 && (!best || Math.abs(m.x - px) < Math.abs(best.x - px))) best = m;
+      return best;
+    };
+    eventsG
+      .append('rect')
+      .attr('class', 'event-hit')
+      .attr('x', pad - 6)
+      .attr('width', w - 2 * pad + 12)
+      .attr('y', axisY - 13)
+      .attr('height', 12)
+      .on('mousemove', (e: MouseEvent) => {
+        const m = nearest(d3.pointer(e, this.svg.node())[0]);
+        eventsG.selectAll<SVGPathElement, (typeof marks)[number]>('path').classed('hover', (d) => d === m);
+        if (!m) {
+          this.tip.style.opacity = '0';
+          return;
+        }
+        this.tip.innerHTML = `<em>${format(m.value)}</em> ${m.label}`;
         this.tip.style.opacity = '1';
-        const tx = Math.max(8, Math.min(X(d.value) - this.tip.offsetWidth / 2, this.width - this.tip.offsetWidth - 8));
+        const tx = Math.max(8, Math.min(m.x - this.tip.offsetWidth / 2, this.width - this.tip.offsetWidth - 8));
         this.tip.style.transform = `translate(${tx}px, -30px)`;
       })
-      .on('mouseleave', () => (this.tip.style.opacity = '0'))
-      .on('mousedown', (e: MouseEvent) => e.stopPropagation())
-      .on('click', (e: MouseEvent, d) => {
+      .on('mouseleave', () => {
+        this.tip.style.opacity = '0';
+        eventsG.selectAll('path').classed('hover', false);
+      })
+      .on('mousedown', (e: MouseEvent) => {
+        // Over an event, pick it instead of scrubbing.
+        if (nearest(d3.pointer(e, this.svg.node())[0])) e.stopPropagation();
+      })
+      .on('click', (e: MouseEvent) => {
+        const m = nearest(d3.pointer(e, this.svg.node())[0]);
+        if (!m) return;
         e.stopPropagation();
-        this.pick(d.value);
+        this.pick(m.value);
       });
 
     // Handle

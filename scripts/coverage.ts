@@ -15,6 +15,7 @@ import type { Topology, GeometryCollection } from 'topojson-specification';
 import { geoArea, geoNaturalEarth1 } from 'd3';
 import { AREAS } from '../src/data/regions';
 import { CIVILISATIONS, EVENTS, civFor } from '../src/data/civilisations';
+import { EVENT_GAPS } from '../src/data/notes/events';
 import { formatYear, isPeoples } from '../src/format';
 import { coverageBins, countByBin } from './coverage-lib';
 
@@ -30,7 +31,12 @@ const showAll = process.argv.includes('--all');
 const bins = coverageBins(MIN_YEAR, MAX_YEAR);
 const w = Math.max(...AREAS.map((a) => a.length)) + 2;
 
-function matrix(title: string, columns: { from: number; to: number; label: string }[], count: (area: string, from: number, to: number) => number) {
+function matrix(
+  title: string,
+  columns: { from: number; to: number; label: string }[],
+  count: (area: string, from: number, to: number) => number,
+  gap: (area: string, from: number) => boolean = () => false,
+) {
   console.log(`\n${title}\n`);
   const cw = Math.max(...columns.map((c) => c.label.length)) + 1;
   const bc = columns.filter((c) => c.from < 0).length;
@@ -40,6 +46,7 @@ function matrix(title: string, columns: { from: number; to: number; label: strin
   for (const area of AREAS) {
     const cells = columns.map((c) => {
       const n = count(area, c.from, c.to);
+      if (!n && gap(area, c.from)) return 'g';
       if (!n) empty++;
       return n === 0 ? '·' : n > 9 ? '+' : String(n);
     });
@@ -52,10 +59,18 @@ function matrix(title: string, columns: { from: number; to: number; label: strin
 matrix('Civilisation notes per area (· = none)', bins, (area, from, to) =>
   countByBin(CIVILISATIONS.filter((c) => (c.areas as string[]).includes(area)), from, to));
 
-// 2. Events, in 500-year steps
-const eventBins = coverageBins(MIN_YEAR, MAX_YEAR, 500, 500);
-matrix('Timeline events per area (· = none)', eventBins, (area, from, to) =>
-  EVENTS.filter((e) => e.area === area && e.year >= from && e.year < to).length);
+// 2. Events: millennia before 3000 BC, then 500-year steps
+const eventBins = coverageBins(MIN_YEAR, MAX_YEAR, 500, 500, { before: -3000, step: 1000 });
+// Acknowledged gaps (g) count as covered, but only in deep prehistory.
+const badGaps = EVENT_GAPS.filter((g) => g.from >= -1000 || !eventBins.some((b) => b.from === g.from));
+if (badGaps.length) throw new Error(`Event gaps must be bins before 1000 BC: ${badGaps.map((g) => `${g.area} ${g.from}`).join(', ')}`);
+matrix(
+  'Timeline events per area (· = none, g = acknowledged gap; millennia before 3000 BC, then 500 years)',
+  eventBins,
+  (area, from, to) => EVENTS.filter((e) => e.area === area && e.year >= from && e.year < to).length,
+  (area, from) => EVENT_GAPS.some((g) => g.area === area && g.from === from),
+);
+console.log(`Acknowledged gaps: ${EVENT_GAPS.length} (see src/data/notes/events.ts)`);
 console.log(`World-wide events (not counted above): ${EVENTS.filter((e) => e.area === 'World').length}`);
 
 // 3. Large polygons without a note

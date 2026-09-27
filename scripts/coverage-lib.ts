@@ -11,10 +11,13 @@ export interface Bin {
  * Periods for the coverage grid: `bcStep` years before AD 1, `adStep` years after.
  * The last bin runs to `max` inclusive.
  */
-export function coverageBins(min: number, max: number, bcStep = 1000, adStep = 100): Bin[] {
+export function coverageBins(min: number, max: number, bcStep = 1000, adStep = 100, early?: { before: number; step: number }): Bin[] {
   const bins: Bin[] = [];
-  for (let y = min; y < 0; y += bcStep) bins.push({ from: y, to: Math.min(0, y + bcStep), label: `${-y / 1000}k` });
-  for (let y = 0; y <= max; y += adStep) bins.push({ from: y, to: Math.min(max + 1, y + adStep), label: adStep === 100 ? `${y / 100 + 1}c` : String(y || 1) });
+  // Optionally coarser bins for deep prehistory, whose dates are rarely finer than a few centuries.
+  let y = min;
+  if (early) for (; y < early.before; y += early.step) bins.push({ from: y, to: Math.min(early.before, y + early.step), label: `${-y / 1000}k` });
+  for (; y < 0; y += bcStep) bins.push({ from: y, to: Math.min(0, y + bcStep), label: `${-y / 1000}k` });
+  for (y = 0; y <= max; y += adStep) bins.push({ from: y, to: Math.min(max + 1, y + adStep), label: adStep === 100 ? `${y / 100 + 1}c` : String(y || 1) });
   return bins;
 }
 

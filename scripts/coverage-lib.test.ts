@@ -15,6 +15,12 @@ describe('coverageBins', () => {
     expect(last).toMatchObject({ from: 2000, to: 2011, label: '21c' });
   });
 
+  it('can use coarser bins for deep prehistory', () => {
+    const bins = coverageBins(-10000, 2010, 500, 500, { before: -3000, step: 1000 });
+    expect(bins.slice(0, 7).map((b) => b.to - b.from)).toEqual([1000, 1000, 1000, 1000, 1000, 1000, 1000]);
+    expect(bins[7]).toMatchObject({ from: -3000, to: -2500 });
+  });
+
   it('tiles the range without gaps', () => {
     const bins = coverageBins(-10000, 2010, 500, 500);
     for (let i = 1; i < bins.length; i++) expect(bins[i].from).toBe(bins[i - 1].to);

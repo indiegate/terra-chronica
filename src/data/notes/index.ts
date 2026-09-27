@@ -9,6 +9,7 @@ import * as asiaMore from './asia-more';
 import * as eastAfrica from './east-africa';
 import * as europe from './europe';
 import * as europeMore from './europe-more';
+import * as extraEvents from './events';
 import * as iranChina from './iran-china';
 import * as islands from './islands';
 import * as koreaJapan from './korea-japan';
@@ -21,7 +22,7 @@ import * as southAsia from './south-asia';
 import * as southeastAsia from './southeast-asia';
 import * as steppe from './steppe';
 
-const FILES = [neolithic, koreaJapan, oceania, northAmerica, southeastAsia, eastAfrica, southAsia, iranChina, modern, europe, steppe, africa, europeMore, asiaMore, africaMore, regional, islands];
+const FILES = [neolithic, koreaJapan, oceania, northAmerica, southeastAsia, eastAfrica, southAsia, iranChina, modern, europe, steppe, africa, europeMore, asiaMore, africaMore, regional, islands, extraEvents];
 
 export const NOTES: CivInput[] = FILES.flatMap((f) => f.notes);
 export const NOTE_EVENTS: HistoricEvent[] = FILES.flatMap((f) => f.events);

@@ -716,7 +716,21 @@ export class MapView {
     });
     g.select('text').text((d) => d.cap.name);
     g.select('title').text((d) => `${d.cap.name} — capital of ${d.civ.name}`);
+    // At world zoom only the capitals of the largest realms on the current survey show.
+    const major = this.majorCivs();
+    g.classed('major', (d) => major.has(d.civ.id));
     this.scaleOverlays();
+  }
+
+  /** Ids of the civilisations covering the most land on the dominant snapshot. */
+  private majorCivs(count = 30): Set<string> {
+    const snap = this.dominant !== null ? this.snapshots.get(this.dominant) : undefined;
+    const area = new Map<string, number>();
+    for (const m of snap?.meta ?? []) {
+      const civ = civFor(m.name, this.year);
+      if (civ) area.set(civ.id, (area.get(civ.id) ?? 0) + m.label.area);
+    }
+    return new Set([...area].sort((a, b) => b[1] - a[1]).slice(0, count).map(([id]) => id));
   }
 
   private scaleOverlays() {
@@ -724,7 +738,7 @@ export class MapView {
     this.capitalRoot.selectAll<SVGGElement, unknown>('g.capital').attr('transform', function () {
       return `translate(${this.getAttribute('data-x')},${this.getAttribute('data-y')}) scale(${1 / k})`;
     });
-    this.capitalRoot.classed('show-names', k >= 3);
+    this.capitalRoot.classed('show-names', k >= 3).classed('show-all', k >= 2.5);
     for (const layer of this.layers) layer.scale?.(k);
     this.paleoRoot.selectAll<SVGTextElement, { kind: string }>('text').style('font-size', (d) => `${(d.kind === 'ocean' ? 13 : 17) / k}px`);
   }
