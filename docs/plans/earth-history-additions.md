@@ -32,6 +32,8 @@ Recommended order, coverage first: 0 → 6 → 8 (no gaps in time), with 1 in pa
 
 ## 0. Foundations
 
+> **Progress (2026-09-27):** 0.1, 0.2, 0.4 and 0.6 are done. The time model is in `src/time.ts`, the layer interface in `src/layers/layer.ts`, and the panel in `src/layers/panel.ts`. Borders, capitals, paleo names and dinosaurs are all registered layers. The project is in git, with Vitest. 0.3 (renderer passes) and 0.5 (strip chart) are left until their first user (ice in 3, climate in 7), so they're built against real data rather than guessed.
+
 The current design has one special-cased overlay (dinosaurs) wired directly into `MapView`, which is already 815 lines. A dozen more layers can't be added the same way.
 
 ### 0.1 One time axis

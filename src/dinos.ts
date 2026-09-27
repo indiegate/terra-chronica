@@ -1,5 +1,7 @@
 import * as d3 from 'd3';
 import { rotateLonLat, type Plates } from './plates';
+import type { MapLayer } from './layers/layer';
+import type { TimeState } from './time';
 
 /*
  * Dinosaur habitat zones: fossil sites (Paleobiology Database) alive around the
@@ -50,7 +52,13 @@ const THROTTLE = 120;
 /** Non-avian dinosaurs end with the Chicxulub impact (Ma). */
 export const EXTINCTION = 66;
 
-export class Dinosaurs {
+export class Dinosaurs implements MapLayer {
+  readonly id = 'dinosaurs';
+  readonly title = 'Dinosaurs';
+  readonly group = 'life';
+  readonly span = { fromBP: 252e6, toBP: EXTINCTION * 1e6 };
+  readonly defaultOn = true;
+  private enabled = true;
   private data: Data | null = null;
   private loading: Promise<void> | null = null;
   private layer: d3.Selection<SVGGElement, unknown, null, undefined>;
@@ -102,10 +110,17 @@ export class Dinosaurs {
     return this.loading;
   }
 
-  /** Show zones for `age` (Ma); 0 hides them. Throttled while the age keeps changing. */
-  update(age: number) {
+  setEnabled(on: boolean) {
+    this.enabled = on;
+    if (on && this.age > 0 && this.age < 260) void this.load();
+    this.render();
+  }
+
+  /** Show zones for the current age; outside deep time they are hidden. Throttled while the age keeps changing. */
+  update(t: TimeState) {
+    const age = t.mode === 'deep' ? t.age : 0;
     this.age = age;
-    if (age > 0 && age < 260) void this.load();
+    if (this.enabled && age > 0 && age < 260) void this.load();
     const due = this.last + THROTTLE - performance.now();
     clearTimeout(this.timer);
     if (due <= 0) this.render();
@@ -141,7 +156,7 @@ export class Dinosaurs {
     const plates = this.plates();
     const age = this.age;
     const [w, h] = this.size();
-    const groups = this.data && plates && age >= EXTINCTION ? this.data.groups : [];
+    const groups = this.enabled && this.data && plates && age >= EXTINCTION ? this.data.groups : [];
     const zones: { group: Group; paths: d3.ContourMultiPolygon; count: number }[] = [];
     for (const [gi, group] of groups.entries()) {
       const pts: [number, number][] = [];

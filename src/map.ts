@@ -8,6 +8,8 @@ import { Dinosaurs } from './dinos';
 import { playImpact } from './impact';
 import { Renderer, type Colours, type LandLayer, type RGBA, type TerritoryLayer, type View } from './gl/renderer';
 import type { LandMesh, TerritoryMesh, TerritoryMeta, WorkerRequest } from './gl/types';
+import { toggleLayer, type MapLayer } from './layers/layer';
+import { HISTORY_SPAN, deepTime, historyTime, type TimeState } from './time';
 
 /*
  * The map is drawn with WebGL (see gl/renderer.ts): land comes from Natural
@@ -77,6 +79,9 @@ export class MapView {
   private capitalRoot: d3.Selection<SVGGElement, unknown, null, undefined>;
   private paleoRoot: d3.Selection<SVGGElement, unknown, null, undefined>;
   private dinos: Dinosaurs;
+  private layers: MapLayer[] = [];
+  private time: TimeState = historyTime(1);
+  private showBorders = true;
   private lastImpact = 0;
   private tooltip: HTMLDivElement;
   private projection = d3.geoNaturalEarth1();
@@ -150,6 +155,27 @@ export class MapView {
       DATA('dinosaurs.json'),
     );
 
+    this.addLayer(
+      toggleLayer({ id: 'borders', title: 'Realms & peoples', group: 'people', span: HISTORY_SPAN, defaultOn: true }, (on) => {
+        this.showBorders = on;
+        this.labelRoot.classed('layer-off', !on);
+        if (!on) this.setHovered(-1);
+        this.invalidate();
+      }),
+    );
+    this.addLayer(
+      toggleLayer({ id: 'capitals', title: 'Capitals', group: 'people', span: HISTORY_SPAN, defaultOn: true }, (on) => {
+        this.capitalRoot.classed('layer-off', !on);
+      }),
+    );
+    this.addLayer(
+      toggleLayer(
+        { id: 'paleo-names', title: 'Past continents & oceans', group: 'earth', span: { fromBP: 1000e6, toBP: 0, mode: 'deep' }, defaultOn: true },
+        (on) => void this.paleoRoot.classed('layer-off', !on),
+      ),
+    );
+    this.addLayer(this.dinos);
+
     this.tooltip = document.createElement('div');
     this.tooltip.className = 'map-tooltip';
     host.appendChild(this.tooltip);
@@ -208,6 +234,31 @@ export class MapView {
         }
         this.ensureDetail();
       });
+  }
+
+  // ── Layers ───────────────────────────────────────────────────────────
+
+  /** Switchable layers, in the order they were added. */
+  get layerList(): readonly MapLayer[] {
+    return this.layers;
+  }
+
+  addLayer(layer: MapLayer) {
+    this.layers.push(layer);
+    layer.setEnabled(layer.defaultOn);
+    layer.update(this.time);
+    layer.scale?.(this.t.k);
+  }
+
+  setLayerEnabled(id: string, on: boolean) {
+    const layer = this.layers.find((l) => l.id === id);
+    if (!layer) return;
+    layer.setEnabled(on);
+    layer.update(this.time);
+  }
+
+  private updateLayers() {
+    for (const layer of this.layers) layer.update(this.time);
   }
 
   // ── Worker ───────────────────────────────────────────────────────────
@@ -275,7 +326,7 @@ export class MapView {
       view: this.view(),
       age: this.age,
       lands: this.landLayers(),
-      territories: this.age > 0 ? [] : visible.map((s) => ({ layer: this.tier(s), opacity: s.opacity })),
+      territories: this.age > 0 || !this.showBorders ? [] : visible.map((s) => ({ layer: this.tier(s), opacity: s.opacity })),
       dashes: this.t.k >= ZOOM_DASHES,
     });
   }
@@ -350,6 +401,7 @@ export class MapView {
     await this.ready;
     const previous = this.age;
     this.age = Math.max(0, ma);
+    this.time = this.age > 0 ? deepTime(this.age) : historyTime(this.year);
     this.plates!.setAge(this.age);
     const quats = new Float32Array(this.plateIds.length * 4);
     this.plateIds.forEach((id, i) => quats.set(this.plates!.rotation(id), i * 4));
@@ -363,13 +415,13 @@ export class MapView {
     // Moving forward in time past the impact (or landing exactly on it) replays it.
     const crossed = previous > IMPACT_AGE && this.age <= IMPACT_AGE && this.age > IMPACT_AGE - 6;
     const impact = (crossed || (this.age === IMPACT_AGE && previous !== IMPACT_AGE)) && performance.now() - this.lastImpact > 5000;
-    if (!impact) this.dinos.update(this.age);
+    if (!impact) this.updateLayers();
     this.ensureDetail();
     this.invalidate();
     if (impact) {
       this.lastImpact = performance.now();
       this.dinos.fadeOut(900);
-      this.dinos.update(this.age); // applied once the fade ends
+      this.updateLayers(); // the dinosaurs apply it once their fade ends
       void this.dinos.load().then(() => {
         const p = this.dinos.impactPoint();
         if (p) playImpact(this.stage, this.t.applyX(p[0]), this.t.applyY(p[1]));
@@ -411,6 +463,10 @@ export class MapView {
   /** Show a blend of snapshots `a` and `b` with weight `t` towards `b`. */
   async show(year: number, a: number, b: number, t: number) {
     this.year = year;
+    if (this.age === 0) {
+      this.time = historyTime(year);
+      this.updateLayers();
+    }
     // The later survey inks in over the earlier one, then the earlier one fades.
     const w = b === a ? 0 : smoothstep(0.25, 0.75, t);
     const wanted = new Map<number, number>([[a, w < 0.5 ? 1 : 2 * (1 - w)]]);
@@ -634,7 +690,7 @@ export class MapView {
       return `translate(${this.getAttribute('data-x')},${this.getAttribute('data-y')}) scale(${1 / k})`;
     });
     this.capitalRoot.classed('show-names', k >= 3);
-    this.dinos?.scale(k);
+    for (const layer of this.layers) layer.scale?.(k);
     this.paleoRoot.selectAll<SVGTextElement, { kind: string }>('text').style('font-size', (d) => `${(d.kind === 'ocean' ? 13 : 17) / k}px`);
   }
 
@@ -642,7 +698,7 @@ export class MapView {
 
   /** Territory id under a point on the dominant snapshot (GPU picking), or -1. */
   private pickAt(p: { x: number; y: number } | MouseEvent): number {
-    if (this.age > 0) return -1;
+    if (this.age > 0 || !this.showBorders) return -1;
     const snap = this.dominant !== null ? this.snapshots.get(this.dominant) : undefined;
     if (!snap) return -1;
     const [x, y] = p instanceof MouseEvent ? d3.pointer(p, this.svg.node()) : [p.x, p.y];

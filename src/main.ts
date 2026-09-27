@@ -4,11 +4,13 @@ import { bracket, loadManifest, loadNameIndex } from './data/borders';
 import { CIVILISATIONS, ERAS, EVENTS, capitalAt, type Civilisation } from './data/civilisations';
 import { GEO_EVENTS, MAX_AGE, PERIODS, ageParts, formatAge, formatAgeShort, periodAt } from './data/geology';
 import { formatSpan, formatYear, inkFor } from './format';
+import { LayersPanel } from './layers/panel';
+import { FIRST_YEAR, LAST_YEAR, deepTime, historyTime } from './time';
 
 const $ = <T extends HTMLElement>(sel: string) => document.querySelector<T>(sel)!;
 
-const MIN_YEAR = -10000;
-const MAX_YEAR = 2010;
+const MIN_YEAR = FIRST_YEAR;
+const MAX_YEAR = LAST_YEAR;
 
 const map = new MapView($('#map'));
 // Dev-only handle for profiling in the browser console.
@@ -64,13 +66,68 @@ let age = 0;
 let inDeepTime = false;
 let playing = false;
 let lastFrame = 0;
+
+// ── Layers ──────────────────────────────────────────────────────────────
+
+const LAYERS_KEY = 'atlas.layers';
+const layerOn = new Map<string, boolean>();
+const layersPanel = new LayersPanel($('#layers'), $<HTMLButtonElement>('#layers-btn'), map.layerList, (id) => layerOn.get(id) ?? false);
+
+/** Choices saved in this browser: layer id → on. */
+function storedLayers(): Record<string, boolean> {
+  try {
+    return JSON.parse(localStorage.getItem(LAYERS_KEY) ?? '{}') ?? {};
+  } catch {
+    return {};
+  }
+}
+
+/** Enabled layers from the URL (`layers=a,b`), else this browser's choices, else the defaults. */
+function applyLayers(fromUrl: Set<string> | null) {
+  const stored = storedLayers();
+  for (const l of map.layerList) {
+    const on = fromUrl ? fromUrl.has(l.id) : (stored[l.id] ?? l.defaultOn);
+    if (layerOn.get(l.id) === on) continue;
+    layerOn.set(l.id, on);
+    map.setLayerEnabled(l.id, on);
+  }
+  layersPanel.render();
+}
+
+/** The `layers=` URL value, or null while the layers are the defaults. */
+function layersParam(): string | null {
+  const changed = map.layerList.some((l) => (layerOn.get(l.id) ?? l.defaultOn) !== l.defaultOn);
+  return changed ? map.layerList.filter((l) => layerOn.get(l.id)).map((l) => l.id).join(',') : null;
+}
+
+layersPanel.onToggle = (id, on) => {
+  layerOn.set(id, on);
+  map.setLayerEnabled(id, on);
+  try {
+    localStorage.setItem(LAYERS_KEY, JSON.stringify({ ...storedLayers(), [id]: on }));
+  } catch {
+    // Storage can be unavailable (private windows); the URL still carries the choice.
+  }
+  writeHash();
+};
+
+// ── URL ─────────────────────────────────────────────────────────────────
+
 readHash();
 
 function readHash() {
   const a = location.hash.match(/age=([\d.]+)/);
   const y = location.hash.match(/year=(-?\d+)/);
+  const l = location.hash.match(/layers=([\w,-]*)/);
   age = a ? Math.max(0, Math.min(MAX_AGE, Number(a[1]) || 0)) : 0;
   if (y) year = Math.max(MIN_YEAR, Math.min(MAX_YEAR, Number(y[1]) || 1));
+  applyLayers(l ? new Set(l[1].split(',').filter(Boolean)) : null);
+}
+
+function writeHash() {
+  const time = inDeepTime ? `age=${age}` : `year=${year}`;
+  const layers = layersParam();
+  history.replaceState(null, '', `#${time}${layers !== null ? `&layers=${layers}` : ''}`);
 }
 
 async function setYear(y: number) {
@@ -80,7 +137,8 @@ async function setYear(y: number) {
   yearEl.textContent = formatYear(year);
   const era = ERAS.find((e) => year >= e.start && year < e.end) ?? ERAS[ERAS.length - 1];
   eraEl.textContent = era.name;
-  history.replaceState(null, '', `#year=${year}`);
+  writeHash();
+  layersPanel.setTime(historyTime(year));
   if (!snapshots.length) return;
   const { a, b, t } = bracket(snapshots, year);
   surveyEl.textContent =
@@ -110,7 +168,8 @@ async function setAge(a: number) {
   yearEl.innerHTML = `${esc(num)} <small>${esc(unit)}</small>`;
   eraEl.textContent = period.name;
   surveyEl.textContent = `${period.era} era`;
-  history.replaceState(null, '', `#age=${age}`);
+  writeHash();
+  layersPanel.setTime(deepTime(age));
   if (info.classList.contains('period')) renderPeriod();
   await map.setGeoAge(age);
 }

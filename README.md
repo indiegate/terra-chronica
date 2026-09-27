@@ -6,6 +6,8 @@ An interactive parchment-style world atlas: drifting continents from a billion y
 npm install
 npm run dev        # http://localhost:5173
 npm run build      # static site in dist/
+npm test           # unit tests (Vitest)
+npm run coverage   # how evenly the notes cover each world area and period
 ```
 
 ## Using it
@@ -15,6 +17,7 @@ npm run build      # static site in dist/
 - **Deep time:** continents drift to where their plates were; past continents and oceans are labelled (Gondwana, Pangaea, Tethys…). Click the map for the current geological period.
 - **Dinosaurs:** from the Triassic to the end of the Cretaceous, shaded zones show where five dinosaur groups lived, each marked with a silhouette (hover for details). Crossing 66 million years ago plays the Chicxulub asteroid impact and the zones fade out.
 - **Search:** press `/` to search any civilisation or polity and fly to it.
+- **Layers:** the stacked-sheets button under the zoom controls switches map layers on and off (realms, capitals, past continents, dinosaurs). Layers with nothing to show at the current date are greyed out. Your choice is remembered in this browser and added to the URL when it differs from the defaults (`&layers=capitals,dinosaurs`).
 - The URL keeps the date (`#year=-500`, or `#age=250` for 250 million years ago), so you can share a link to it.
 
 ## Data
