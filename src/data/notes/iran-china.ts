@@ -17,7 +17,7 @@ export const notes: CivInput[] = [
     capitals: [['Shiraz', 52.53, 29.61, 1751, 1794], ['Tehran', 51.39, 35.69, 1794, 1925]], match: ['Persia'],
     summary: 'Karim Khan Zand restored order from Shiraz after the Safavid collapse; the Qajar dynasty, ruling from Tehran from 1794, lost the Caucasus to Russia and fell under Russian and British influence. The Constitutional Revolution of 1905–11 created Iran’s first parliament.' },
   { id: 'modern-iran', name: 'Iran', start: 1925, end: 2010, peak: 1975, region: 'Iran',
-    capitals: [['Tehran', 51.39, 35.69]], match: ['Iran'],
+    capitals: [['Tehran', 51.39, 35.69]], match: ['Iran', 'Persia'],
     summary: 'Reza Shah Pahlavi founded a modernising monarchy in 1925. His son was restored by a British- and American-backed coup against Prime Minister Mosaddegh in 1953, and overthrown in the revolution of 1979, which created the Islamic Republic. War with Iraq followed in 1980–88.' },
 
   // ── Central Asia and Mongolia ──────────────────────────────────────────

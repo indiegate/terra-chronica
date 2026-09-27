@@ -8,7 +8,7 @@ export const notes: CivInput[] = [
     summary: 'Keepers of the world’s oldest continuous cultures, in Australia for at least 50,000 years (see the prehistory slider). Hundreds of nations, each with its own language and Country, lived by hunting, gathering, fishing and fire-stick land management, with rock-art traditions tens of thousands of years old. British colonisation from 1788 brought disease, dispossession and violence.' },
   { id: 'new-guinea', name: 'New Guinea farmers', start: -8000, end: 1884, peak: 1000, region: 'Oceania',
     capitals: [], place: [144.33, -5.78],
-    match: ['Papuan neolithic farmers', 'Papuan', 'Papuans', 'Papua New Guinea'],
+    match: ['Papuan neolithic farmers', 'Papuan', 'Papuans', 'Papua New Guinea', 'New Guinea'],
     summary: 'At Kuk Swamp in the New Guinea highlands people drained wetlands to grow taro and bananas by about 7000 BC, one of the world’s independent inventions of farming. The island’s hundreds of societies speak more than 800 languages, more than anywhere else on Earth.' },
   { id: 'austronesians', name: 'Austronesian seafarers', start: -5000, end: -400, peak: -1500, region: 'Southeast Asia', areas: ['Southeast Asia', 'Oceania'],
     capitals: [], place: [120.9, 23.7], match: ['Austronesians', 'Dapenkeng culture'],

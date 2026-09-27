@@ -55,7 +55,7 @@ export const notes: CivInput[] = [
     capitals: [['Ankara', 32.85, 39.93]], match: ['Turkey', 'Republic of Turkey'],
     summary: 'The republic founded by Mustafa Kemal Atatürk in 1923 on the Ottoman core, which adopted a secular state, Latin script and Western law. Multiparty politics from 1950 were punctuated by military coups.' },
   { id: 'saudi-arabia', name: 'Saudi Arabia', start: 1744, end: 2010, peak: 2000, region: 'Near East',
-    capitals: [['Diriyah', 46.57, 24.73, 1744, 1818], ['Riyadh', 46.72, 24.63, 1824, 2010]], match: ['Nejd', 'Arabia', 'Arabia (Nejd)', 'Saudi Arabia'],
+    capitals: [['Diriyah', 46.57, 24.73, 1744, 1818], ['Riyadh', 46.72, 24.63, 1824, 2010]], match: ['Nejd', 'Arabia', 'Arabia (Nejd)', 'Saudi Arabia', 'Kingdom of Hejaz and Nejd'],
     summary: 'The alliance of Muhammad ibn Saud and the preacher Muhammad ibn Abd al-Wahhab in 1744 created the first Saudi state in Nejd; the rival Rashidis of Ha’il held Nejd from 1891 until Ibn Saud retook Riyadh in 1902. Ibn Saud conquered the Hejaz in 1925 and founded the kingdom in 1932; oil, found in 1938, made it the world’s largest exporter.' },
   { id: 'hejaz', name: 'Hejaz', start: 600, end: 1932, peak: 632, region: 'Near East',
     capitals: [['Mecca', 39.83, 21.42]], match: ['Hejaz'],

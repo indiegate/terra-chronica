@@ -56,7 +56,7 @@ export const notes: CivInput[] = [
     capitals: [['York Factory', -92.3, 57.0]], match: ["Rupert's Land"],
     summary: 'The vast Hudson Bay drainage basin, granted by Charles II to the Hudson’s Bay Company in 1670 and run as a fur-trading domain through posts such as York Factory until its sale to Canada in 1870.' },
   { id: 'canada', name: 'British North America & Canada', start: 1763, end: 2010, peak: 1990, region: 'North America',
-    capitals: [['Quebec City', -71.21, 46.81, 1763, 1841], ['Ottawa', -75.7, 45.42, 1866, 2010]], match: ['Quebec', 'Canada', 'Dominion of Newfoundland'],
+    capitals: [['Quebec City', -71.21, 46.81, 1763, 1841], ['Ottawa', -75.7, 45.42, 1866, 2010]], match: ['Quebec', 'Canada', 'Dominion of Newfoundland', 'British North America'],
     summary: 'Britain took New France in 1763. Its North American colonies federated as the Dominion of Canada in 1867, bought Rupert’s Land in 1870 and grew into a transcontinental country, officially bilingual in English and French. Newfoundland joined in 1949.' },
   { id: 'mexico', name: 'Mexico', start: 1821, end: 2010, peak: 1990, region: 'Mesoamerica',
     capitals: [['Mexico City', -99.13, 19.43]], match: ['Mexico'],
