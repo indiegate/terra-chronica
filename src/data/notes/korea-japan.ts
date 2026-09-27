@@ -32,7 +32,7 @@ export const notes: CivInput[] = [
   { id: 'japan', name: 'Japan', start: 1947, end: 2010, peak: 1990, region: 'Japan',
     capitals: [TOKYO], match: ['Japan'],
     summary: 'A parliamentary democracy under the 1947 constitution, Japan rebuilt after the war to become the world’s second-largest economy from 1968 until 2010.' },
-  { id: 'epi-jomon', name: 'Epi-Jōmon & Satsumon', start: -300, end: 1200, peak: 800, region: 'Japan',
+  { id: 'epi-jomon', name: 'Epi-Jōmon & Satsumon', start: -350, end: 1200, peak: 800, region: 'Japan',
     capitals: [], place: [142.6, 43.3], match: ['Epi-Jōmon', 'Satsumon culture'],
     summary: 'In Hokkaido, beyond the reach of rice farming, foragers carried on Jōmon ways as the Epi-Jōmon culture, followed from about AD 700 by the Satsumon, who grew millet and traded with Honshu. The Ainu culture grew out of them in the 13th century.' },
   { id: 'ainu', name: 'Ainu', start: 1200, end: 1869, peak: 1600, region: 'Japan',

@@ -3,7 +3,7 @@ import type { CivInput, HistoricEvent } from '../civilisations';
 
 export const notes: CivInput[] = [
   { id: 'aboriginal-australians', name: 'Aboriginal Australians', start: -10000, end: 2010, peak: 1700, region: 'Oceania',
-    capitals: [], place: [131.04, -25.34],
+    capitals: [], place: [131.04, -25.34], covers: { box: [112, -44, 154, -10], to: 1815 },
     match: ['Aboriginal tribes', 'Australian aboriginal hunter-gatherers', 'Aboriginal Tasmanians', 'Tasmanian hunter-gatherers'],
     summary: 'Keepers of the world’s oldest continuous cultures, in Australia for at least 50,000 years (see the prehistory slider). Hundreds of nations, each with its own language and Country, lived by hunting, gathering, fishing and fire-stick land management, with rock-art traditions tens of thousands of years old. British colonisation from 1788 brought disease, dispossession and violence.' },
   { id: 'new-guinea', name: 'New Guinea farmers', start: -8000, end: 1884, peak: 1000, region: 'Oceania',
@@ -26,7 +26,7 @@ export const notes: CivInput[] = [
   { id: 'rapa-nui', name: 'Rapa Nui', start: 1200, end: 1888, peak: 1500, region: 'Polynesia',
     capitals: [], place: [-109.35, -27.12], match: [],
     summary: 'The most remote inhabited island on Earth, settled by Polynesians around 1200. Its people carved nearly a thousand moai statues of their ancestors. Contact with Europeans from 1722 and Peruvian slave raids in the 1860s devastated the population; Chile annexed the island in 1888.' },
-  { id: 'maori', name: 'Māori', start: 1280, end: 2010, peak: 1700, region: 'Polynesia',
+  { id: 'maori', name: 'Māori', start: 1250, end: 2010, peak: 1700, region: 'Polynesia',
     capitals: [], place: [175.9, -38.1], match: ['Maori', 'Maoris', 'Māori'],
     summary: 'Polynesian voyagers reached Aotearoa (New Zealand) around 1280, the last large land mass to be settled by people. They hunted the giant moa to extinction, built fortified pā and a rich carving tradition. The Treaty of Waitangi with Britain (1840) was followed by wars over land.' },
   { id: 'australia', name: 'Australia', start: 1788, end: 2010, peak: 1990, region: 'Oceania',

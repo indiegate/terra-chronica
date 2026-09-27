@@ -20,12 +20,12 @@ describe('civilisation notes', () => {
   });
 
   it('match polygon names that exist in the border snapshots', () => {
-    const missing = CIVILISATIONS.flatMap((c) => c.match.filter((n) => !names[n]).map((n) => `${c.id}: ${n}`));
+    const missing = CIVILISATIONS.flatMap((c) => c.match.filter((n) => !names[n.trim()]).map((n) => `${c.id}: ${n}`));
     expect(missing).toEqual([]);
   });
 
   it('match at least one snapshot within their own dates (or none at all)', () => {
-    const idle = CIVILISATIONS.filter((c) => c.match.length && !c.match.some((n) => names[n].some((y) => y >= c.start && y <= c.end)));
+    const idle = CIVILISATIONS.filter((c) => c.match.length && !c.match.some((n) => names[n.trim()].some((y) => y >= c.start && y <= c.end)));
     expect(idle.map((c) => c.id)).toEqual([]);
   });
 

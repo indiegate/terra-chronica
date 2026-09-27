@@ -5,6 +5,7 @@
 
 import { areasFor, type Area } from './regions';
 import { NOTES, NOTE_EVENTS } from './notes';
+import UMBRELLA from './notes/umbrella.json';
 
 export interface Capital {
   name: string;
@@ -29,6 +30,12 @@ export interface Civilisation {
   summary: string;
   /** Where to fly to for cultures without a capital (a key site), [lon, lat]. */
   place?: [number, number];
+  /**
+   * Umbrella notes: unclaimed polygons whose largest part lies in `box`
+   * ([lon0, lat0, lon1, lat1]) between `from` and `to` (default: the note's
+   * dates) are linked to this note (scripts/umbrella.ts).
+   */
+  covers?: { box: [number, number, number, number]; from?: number; to?: number };
 }
 
 export type CapitalInput = [name: string, lon: number, lat: number, from?: number, to?: number];
@@ -130,8 +137,8 @@ const DATA: CivInput[] = [
   { id: 'kushan', name: 'Kushan Empire', start: 30, end: 375, peak: 150, region: 'Central Asia',
     capitals: [['Purushapura', 71.57, 34.01]], match: ['Kushan Empire'],
     summary: 'A crossroads empire linking Rome, Persia, India and China; patron of Gandharan Greco-Buddhist art.' },
-  { id: 'axum', name: 'Kingdom of Aksum', start: 100, end: 940, peak: 350, region: 'East Africa',
-    capitals: [['Aksum', 38.72, 14.13]], match: ['Axum'],
+  { id: 'axum', name: 'Kingdom of Aksum', start: -50, end: 940, peak: 350, region: 'East Africa',
+    capitals: [['Aksum', 38.72, 14.13]], match: ['Axum', 'Ethiopian Highland Peoples'],
     summary: 'A Red Sea trading power famed for its towering stelae and early adoption of Christianity in the 4th century.' },
   { id: 'teotihuacan', name: 'Teotihuacan', start: -100, end: 550, peak: 450, region: 'Mesoamerica',
     capitals: [['Teotihuacan', -98.84, 19.69]], match: ['Teotihuacan'],
@@ -155,12 +162,12 @@ const DATA: CivInput[] = [
     capitals: [['Constantinople', 28.98, 41.01, 395, 1204], ['Nicaea', 29.72, 40.43, 1204, 1261], ['Constantinople', 28.98, 41.01, 1261, 1453]],
     match: ['Eastern Roman Empire', 'Byzantine Empire'],
     summary: 'The eastern half of the Roman Empire, which survived a thousand years after the fall of the west and preserved Greek learning.' },
-  { id: 'ghana', name: 'Ghana Empire', start: 300, end: 1100, peak: 1000, region: 'West Africa',
+  { id: 'ghana', name: 'Ghana Empire', start: 300, end: 1240, peak: 1000, region: 'West Africa',
     capitals: [['Koumbi Saleh', -7.99, 15.77]], match: ['Empire of Ghana'],
     summary: 'The “land of gold”, a Sahelian empire that grew rich from trans-Saharan trade in gold and salt.' },
-  { id: 'franks', name: 'Frankish Realm', start: 481, end: 888, peak: 814, region: 'Western Europe',
+  { id: 'franks', name: 'Frankish Realm', start: 481, end: 987, peak: 814, region: 'Western Europe',
     capitals: [['Tournai', 3.39, 50.61, 481, 508], ['Paris', 2.35, 48.86, 508, 794], ['Aachen', 6.08, 50.78, 794, 888]],
-    match: ['Franks', 'Frankish Kingdom', 'Carolingian Empire'],
+    match: ['Franks', 'Frankish Kingdom', 'Carolingian Empire', 'Neustria', 'Carolingian Empire', 'East Francia', 'West Francia'],
     summary: 'The kingdom of Clovis and Charlemagne, crowned emperor in 800, which laid the foundations of France and Germany.' },
   { id: 'sui-tang', name: 'Sui & Tang China', start: 581, end: 907, peak: 700, region: 'East Asia',
     capitals: [['Chang’an', 108.94, 34.26]], match: ['Sui Empire', 'Tang Empire'],
@@ -172,7 +179,7 @@ const DATA: CivInput[] = [
     capitals: [['Medina', 39.61, 24.47, 632, 661], ['Damascus', 36.29, 33.51, 661, 750], ['Kufa', 44.4, 32.03, 750, 762], ['Baghdad', 44.37, 33.31, 762, 1258]],
     match: ['Umayyad Caliphate', 'Abbasid Caliphate'],
     summary: 'The Umayyad and Abbasid caliphates stretched from Iberia to the Indus; Abbasid Baghdad’s House of Wisdom became a centre of learning.' },
-  { id: 'khazars', name: 'Khazar Khaganate', start: 650, end: 969, peak: 850, region: 'Steppe',
+  { id: 'khazars', name: 'Khazar Khaganate', start: 600, end: 1016, peak: 850, region: 'Steppe',
     capitals: [['Atil (site uncertain)', 47.9, 46.4]], match: ['Khazars'],
     summary: 'A Turkic steppe power between the Black and Caspian seas whose elite adopted Judaism.' },
   { id: 'tiwanaku', name: 'Tiwanaku & Wari', start: 500, end: 1000, peak: 750, region: 'Andes',
@@ -184,8 +191,8 @@ const DATA: CivInput[] = [
   { id: 'khmer', name: 'Khmer Empire', start: 802, end: 1431, peak: 1200, region: 'Southeast Asia',
     capitals: [['Angkor', 103.87, 13.41]], match: ['Khmer Empire'],
     summary: 'Builders of Angkor Wat, the Khmer ran a vast hydraulic city and dominated mainland Southeast Asia.' },
-  { id: 'kievan-rus', name: 'Kievan Rus’', start: 882, end: 1240, peak: 1050, region: 'Eastern Europe',
-    capitals: [['Kyiv', 30.52, 50.45]], match: ['Kyivan Rus', 'Kievan Rus', 'Other Rus Principalities'],
+  { id: 'kievan-rus', name: 'Kievan Rus’', start: 800, end: 1240, peak: 1050, region: 'Eastern Europe',
+    capitals: [['Kyiv', 30.52, 50.45]], match: ['Kyivan Rus', 'Kievan Rus', 'Other Rus Principalities', "Rus' Khaganate"],
     summary: 'A federation of East Slavic principalities founded by Varangian rulers, which adopted Orthodox Christianity in 988.' },
   { id: 'hre', name: 'Holy Roman Empire', start: 962, end: 1806, peak: 1200, region: 'Central Europe',
     capitals: [['Aachen (coronations)', 6.08, 50.78, 962, 1346], ['Prague', 14.42, 50.09, 1346, 1438], ['Vienna', 16.37, 48.21, 1438, 1806]],
@@ -214,10 +221,10 @@ const DATA: CivInput[] = [
     capitals: [['Karakorum', 102.83, 47.2, 1235, 1264], ['Khanbaliq', 116.4, 39.9, 1264, 1368]],
     match: ['Great Khanate', 'Ilkhanate', 'Khanate of the Golden Horde', 'Chagatai Khanate'],
     summary: 'Founded by Genghis Khan, the largest contiguous land empire in history, stretching from Korea to Eastern Europe.' },
-  { id: 'mali', name: 'Mali Empire', start: 1235, end: 1600, peak: 1330, region: 'West Africa',
+  { id: 'mali', name: 'Mali Empire', start: 1235, end: 1670, peak: 1330, region: 'West Africa',
     capitals: [['Niani (site debated)', -8.4, 11.4]], match: ['Mali'],
     summary: 'The empire of Sundiata and Mansa Musa, whose pilgrimage to Mecca became legendary for its wealth; Timbuktu flourished as a centre of scholarship.' },
-  { id: 'great-zimbabwe', name: 'Great Zimbabwe', start: 1100, end: 1450, peak: 1350, region: 'Southern Africa',
+  { id: 'great-zimbabwe', name: 'Great Zimbabwe', start: 1000, end: 1450, peak: 1350, region: 'Southern Africa',
     capitals: [['Great Zimbabwe', 30.93, -20.27]], match: ['Great Zimbabwe'],
     summary: 'A Shona kingdom whose dry-stone city controlled gold trade with the Swahili coast.' },
   { id: 'delhi', name: 'Delhi Sultanate', start: 1206, end: 1526, peak: 1330, region: 'South Asia',
@@ -229,7 +236,7 @@ const DATA: CivInput[] = [
   { id: 'chimu', name: 'Chimú', start: 900, end: 1470, peak: 1400, region: 'Andes',
     capitals: [['Chan Chan', -79.07, -8.11]], match: ['Chimú Empire'],
     summary: 'A coastal Andean kingdom whose adobe capital Chan Chan was the largest city in pre-Columbian South America.' },
-  { id: 'vijayanagara', name: 'Vijayanagara Empire', start: 1336, end: 1646, peak: 1520, region: 'South Asia',
+  { id: 'vijayanagara', name: 'Vijayanagara Empire', start: 1336, end: 1652, peak: 1520, region: 'South Asia',
     capitals: [['Vijayanagara (Hampi)', 76.46, 15.33, 1336, 1565], ['Penukonda', 77.59, 14.08, 1565, 1592], ['Chandragiri', 79.31, 13.58, 1592, 1646]],
     match: ['Vijayanagara'],
     summary: 'The great Hindu empire of the Deccan; its capital at Hampi was among the largest cities in the world until it was sacked in 1565.' },
@@ -248,7 +255,7 @@ const DATA: CivInput[] = [
     match: ['Ming Empire and Northern Yuan', 'Ming Empire', 'Ming Chinese Empire'],
     summary: 'The dynasty of the Forbidden City, Zheng He’s treasure fleets and the rebuilt Great Wall.' },
   { id: 'aztec', name: 'Aztec Empire', start: 1428, end: 1521, peak: 1519, region: 'Mesoamerica',
-    capitals: [['Tenochtitlan', -99.13, 19.43]], match: ['Aztec Empire'],
+    capitals: [['Tenochtitlan', -99.13, 19.43]], match: ['Aztec Empire', 'Mexihcah (Triple Alliance)'],
     summary: 'The Triple Alliance centred on Tenochtitlan, an island city of canals and temples conquered by Cortés.' },
   { id: 'inca', name: 'Inca Empire', start: 1438, end: 1533, peak: 1527, region: 'Andes',
     capitals: [['Cusco', -71.97, -13.53]], match: ['Inca Empire', 'Quechua'],
@@ -258,7 +265,7 @@ const DATA: CivInput[] = [
     summary: 'The largest of the Sahelian empires, ruling the Niger bend until a Moroccan invasion in 1591.' },
   { id: 'spain', name: 'Spanish Empire', start: 1492, end: 1898, peak: 1790, region: 'Global', areas: ['Europe'],
     capitals: [['Toledo', -4.02, 39.86, 1492, 1561], ['Madrid', -3.7, 40.42, 1561, 1898]],
-    match: ['Spain', 'Castille', 'Cuba (Spain)', 'Hispaniola (Spain)'],
+    match: ['Spain', 'Castille', 'Cuba (Spain)', 'Hispaniola (Spain)', 'Florida (Spain)'],
     summary: 'One of the first global empires, spanning the Americas, the Philippines and parts of Europe.' },
   { id: 'portugal', name: 'Portuguese Empire', start: 1415, end: 1999, peak: 1600, region: 'Global', areas: ['Europe'],
     capitals: [['Lisbon', -9.14, 38.72, 1415, 1808], ['Rio de Janeiro', -43.17, -22.91, 1808, 1821], ['Lisbon', -9.14, 38.72, 1821, 1999]],
@@ -285,7 +292,7 @@ const DATA: CivInput[] = [
     summary: 'A vast elective monarchy with a powerful noble parliament, among the largest states of early-modern Europe.' },
   { id: 'britain', name: 'British Empire', start: 1707, end: 1997, peak: 1920, region: 'Global', areas: ['Europe'],
     capitals: [['London', -0.13, 51.51]],
-    match: ['United Kingdom', 'United Kingdom of Great Britain and Ireland', 'British Raj', 'British American colonies'],
+    match: ['United Kingdom', 'United Kingdom of Great Britain and Ireland', 'British Raj', 'British American colonies', 'Acadian Peninsula (UK)'],
     summary: 'At its height the largest empire in history, covering nearly a quarter of the world’s land.' },
   { id: 'usa', name: 'United States', start: 1776, end: 2010, peak: 2000, region: 'North America',
     capitals: [['Philadelphia', -75.17, 39.95, 1776, 1800], ['Washington', -77.04, 38.9, 1800, 2010]],
@@ -299,6 +306,7 @@ const DATA: CivInput[] = [
 export const CIVILISATIONS: Civilisation[] = [...DATA, ...NOTES].map((c) => ({
   ...c,
   areas: areasFor(c.id, c.region, c.areas),
+  match: [...c.match, ...((UMBRELLA as Record<string, string[]>)[c.id] ?? [])],
   capitals: c.capitals.map(([name, lon, lat, from = c.start, to = c.end]) => ({ name, lon, lat, from, to })),
 }));
 

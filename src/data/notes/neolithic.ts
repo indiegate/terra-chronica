@@ -63,7 +63,7 @@ export const notes: CivInput[] = [
   { id: 'predynastic-egypt', name: 'Predynastic Egypt', start: -5200, end: -3100, peak: -3500, region: 'North Africa',
     capitals: [], place: [32.7, 25.9], match: ['Early Neolithic Egypt', 'Naqada culture'],
     summary: 'Farming villages in the Faiyum and at Merimde from about 5200 BC were followed by the Badarian and Naqada cultures of Upper Egypt, whose chiefdoms, painted pottery and early hieroglyphs led up to the unification of Egypt.' },
-  { id: 'a-group', name: 'Nubian A-Group', start: -3800, end: -2900, peak: -3300, region: 'Nubia',
+  { id: 'a-group', name: 'Nubian A-Group', start: -4000, end: -2900, peak: -3300, region: 'Nubia',
     capitals: [], place: [31.7, 22.0], match: ['Nubian A-Group'],
     summary: 'Cattle herders and farmers of Lower Nubia who traded with predynastic Egypt; rich burials at Qustul hint at an early kingdom. They fade from the record around 2900 BC, as Egypt raided the region.' },
   { id: 'sahara', name: 'Peoples of the Sahara', start: -7000, end: 2010, peak: -5000, region: 'North Africa', areas: ['North Africa', 'West Africa'],
@@ -104,7 +104,7 @@ export const notes: CivInput[] = [
     capitals: [], place: [-72, -13.5], match: ['Andean coastal foragers', 'Archaic Amerindian hunter-gatherers'],
     summary: 'Descendants of the first Americans spread from the Amazon to Tierra del Fuego. In the Andes they domesticated potatoes, quinoa, llamas, alpacas and guinea pigs; on the Pacific coast they fished, and they began shaping the Amazon forest with useful trees.' },
   { id: 'amazonia', name: 'Peoples of Amazonia', start: -1500, end: 1800, peak: 1000, region: 'South America',
-    capitals: [], place: [-60, -5], match: ['Amazon hunter-gatherers', 'Manioc farmers', 'Tupis', 'Tekohá (Guarani)', 'Mbya'],
+    capitals: [], place: [-60, -5], covers: { box: [-80, -24, -34, 12] }, match: ['Amazon hunter-gatherers', 'Manioc farmers', 'Tupis', 'Tekohá (Guarani)', 'Mbya'],
     summary: 'Manioc farmers and forest foragers of the Amazon basin. Some built large settlements with raised fields, earthworks and fertile “dark earth” (terra preta); Tupi-speakers spread along the Atlantic coast. European diseases after 1500 caused a catastrophic collapse.' },
 ];
 
