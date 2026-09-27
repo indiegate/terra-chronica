@@ -1,0 +1,45 @@
+# Complete History
+
+An interactive parchment-style world atlas: drifting continents from a billion years ago, then the peoples, kingdoms and empires of the last 12,000 years (10,000 BC to AD 2010).
+
+```bash
+npm install
+npm run dev        # http://localhost:5173
+npm run build      # static site in dist/
+```
+
+## Using it
+
+- **Map:** scroll or pinch to zoom, drag to pan, click a territory or a ★ capital for details. Use `⌂` to reset the view.
+- **Two sliders:** the upper one spans geological time (1 billion years ago to today), the lower one human history (10,000 BC to AD 2010). Only one is active; the other is dimmed until you touch it. Drag a seal, click a band (period or era) or a ◆ event. `←/→` step through time, `Shift+←/→` jump between border surveys, `Space` plays or pauses. Playing deep time flows on into human history.
+- **Deep time:** continents drift to where their plates were; past continents and oceans are labelled (Gondwana, Pangaea, Tethys…). Click the map for the current geological period.
+- **Dinosaurs:** from the Triassic to the end of the Cretaceous, shaded zones show where five dinosaur groups lived, each marked with a silhouette (hover for details). Crossing 66 million years ago plays the Chicxulub asteroid impact and the zones fade out.
+- **Search:** press `/` to search any civilisation or polity and fly to it.
+- The URL keeps the date (`#year=-500`, or `#age=250` for 250 million years ago), so you can share a link to it.
+
+## Data
+
+- **Borders:** [historical-basemaps](https://github.com/aourednik/historical-basemaps) by A. Ourednik (GPL-3.0), 52 snapshots. Between two snapshots, the map fades from the earlier borders to the later ones.
+  - Kept at full source resolution and clipped to the Natural Earth 1:10m coastline. Inland borders are only as detailed as the source.
+  - 1994, 2000 and 2010 use Natural Earth 1:10m country borders, named after the source polygon they overlap most. Crimea is kept in Ukraine, as it was in 2010 (Natural Earth shows today's de facto control).
+  - Naming errors and anachronisms in the source are corrected in `scripts/corrections.mjs`, each with its reason.
+  - Each snapshot has a simplified `.lo.json` (2 km tolerance) for the zoomed-out view; full detail loads from 4× zoom.
+- **Land and plates:** Natural Earth coastlines (1:110m, 1:50m, 1:10m by zoom) split along the static polygons of the [Merdith et al. 2021](https://doi.org/10.5281/zenodo.10346399) plate model (CC BY 4.0), so each piece belongs to a tectonic plate. The model's rotations (`rotations.json`) place every plate at any age up to 1 billion years ago; the client reproduces GPlates' reconstructions to within metres. Before the Cambrian (from 540 to 600 million years ago) the map fades from today's coastline shapes to the model's continental blocks (`plates-blocks.json`), since modern shapes would be anachronistic that far back.
+- **Geological periods and events** (`src/data/geology.ts`): dates and colours from the International Chronostratigraphic Chart; past-continent and ocean labels are anchored to plates and placed by the same rotations as the land.
+- **Dinosaur finds:** [Paleobiology Database](https://paleobiodb.org) (CC BY 4.0), fetched by clade in `scripts/build-dinos.mjs`. Sites dated to within 25 million years, one per site and age range; each is placed on its plate and moved with the plate model. Zones are density contours of sites alive within ±3 million years of the current age. The silhouettes are drawn for this project.
+- **Civilisation notes** (`src/data/civilisations.ts`): hand-written entries with dates, capitals (changing over time) and short summaries, linked to polygon names within each civilisation's own dates. The same file holds the eras and timeline events.
+
+To regenerate `public/data/`, download the raw `world_*.geojson` files into `data-raw/` and run `npm run data` (about 2 minutes). `npm run data:plates` rebuilds only the plate data (it downloads the model on first run); `npm run data:dinos` rebuilds the dinosaur finds (after the plate data).
+
+Known limits of the source that can't be fixed by renaming: the Holy Roman Empire has no polygon in 1783 and 1800, and some polygons (e.g. "Ming Empire and Northern Yuan" in 1400) merge two states into one shape.
+
+## Rendering
+
+The map is drawn with WebGL2 (`src/gl/`):
+
+- **Land** is rotated per plate to the current geological age and projected to Natural Earth in the vertex shader. Shapes that cross the map's edge are drawn with ±360° copies and cut at the edge.
+- **Territories** come from the pre-projected snapshot meshes and are drawn to an offscreen buffer, then composited once with shared translucency and a watercolour wobble.
+- **Lines** are screen-space quads, so widths and dashes stay constant at any zoom.
+- **Picking** (hover, click) renders territory ids into a one-pixel buffer.
+- Meshes are triangulated in a Web Worker (`src/gl/mesh.worker.ts`). Labels and capitals are an SVG overlay.
+
