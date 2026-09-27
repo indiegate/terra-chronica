@@ -32,10 +32,10 @@ export interface Civilisation {
   place?: [number, number];
   /**
    * Umbrella notes: unclaimed polygons whose largest part lies in `box`
-   * ([lon0, lat0, lon1, lat1]) between `from` and `to` (default: the note's
+   * ([lon0, lat0, lon1, lat1], or a list of such boxes) between `from` and `to` (default: the note's
    * dates) are linked to this note (scripts/umbrella.ts).
    */
-  covers?: { box: [number, number, number, number]; from?: number; to?: number };
+  covers?: { box: [number, number, number, number] | [number, number, number, number][]; from?: number; to?: number };
 }
 
 export type CapitalInput = [name: string, lon: number, lat: number, from?: number, to?: number];
@@ -265,11 +265,11 @@ const DATA: CivInput[] = [
     summary: 'The largest of the Sahelian empires, ruling the Niger bend until a Moroccan invasion in 1591.' },
   { id: 'spain', name: 'Spanish Empire', start: 1492, end: 1898, peak: 1790, region: 'Global', areas: ['Europe'],
     capitals: [['Toledo', -4.02, 39.86, 1492, 1561], ['Madrid', -3.7, 40.42, 1561, 1898]],
-    match: ['Spain', 'Castille', 'Cuba (Spain)', 'Hispaniola (Spain)', 'Florida (Spain)'],
+    match: ['Spain', 'Castille', 'Cuba (Spain)', 'Hispaniola (Spain)', 'Florida (Spain)', 'Franche-Comté', 'Canary Islands (Spain)'],
     summary: 'One of the first global empires, spanning the Americas, the Philippines and parts of Europe.' },
   { id: 'portugal', name: 'Portuguese Empire', start: 1415, end: 1999, peak: 1600, region: 'Global', areas: ['Europe'],
     capitals: [['Lisbon', -9.14, 38.72, 1415, 1808], ['Rio de Janeiro', -43.17, -22.91, 1808, 1821], ['Lisbon', -9.14, 38.72, 1821, 1999]],
-    match: ['Portugal', 'Portuguese East Africa'],
+    match: ['Portugal', 'Portuguese East Africa', 'Goa'],
     summary: 'A pioneering maritime empire of trading posts from Brazil to Macau that lasted nearly six centuries.' },
   { id: 'safavid', name: 'Safavid Persia', start: 1501, end: 1736, peak: 1600, region: 'Iran',
     capitals: [['Tabriz', 46.29, 38.08, 1501, 1555], ['Qazvin', 50.0, 36.27, 1555, 1598], ['Isfahan', 51.67, 32.65, 1598, 1736]],
@@ -296,7 +296,7 @@ const DATA: CivInput[] = [
     summary: 'At its height the largest empire in history, covering nearly a quarter of the world’s land.' },
   { id: 'usa', name: 'United States', start: 1776, end: 2010, peak: 2000, region: 'North America',
     capitals: [['Philadelphia', -75.17, 39.95, 1776, 1800], ['Washington', -77.04, 38.9, 1800, 2010]],
-    match: ['United States of America', 'United States'],
+    match: ['United States of America', 'United States', 'Hawaii (USA)'],
     summary: 'A federal republic born of revolution in 1776 that expanded across the continent and became a global power.' },
   { id: 'ussr', name: 'Soviet Union', start: 1922, end: 1991, peak: 1960, region: 'Eurasia', areas: ['Europe', 'Steppe & Central Asia'],
     capitals: [['Moscow', 37.62, 55.76]], match: ['USSR'],

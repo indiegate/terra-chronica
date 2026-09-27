@@ -27,8 +27,10 @@ const out: Record<string, Set<string>> = {};
 for (const p of polygons()) {
   if (linked(p.name, p.year)) continue;
   const u = umbrellas.find((c) => {
-    const { box: [x0, y0, x1, y1], from = c.start, to = c.end } = c.covers!;
-    return p.year >= Math.max(from, c.start) && p.year <= Math.min(to, c.end) && p.lon >= x0 && p.lon <= x1 && p.lat >= y0 && p.lat <= y1;
+    const { box, from = c.start, to = c.end } = c.covers!;
+    const boxes = (typeof box[0] === 'number' ? [box] : box) as number[][];
+    const inBox = boxes.some(([x0, y0, x1, y1]) => p.lon >= x0 && p.lon <= x1 && p.lat >= y0 && p.lat <= y1);
+    return inBox && p.year >= Math.max(from, c.start) && p.year <= Math.min(to, c.end);
   });
   if (u) (out[u.id] ??= new Set()).add(p.name);
 }

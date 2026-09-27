@@ -67,7 +67,7 @@ export const notes: CivInput[] = [
     capitals: [], place: [-80, 66], match: ['Arctic marine mammal hunters', 'Paleo-Inuit', 'Dorset'],
     summary: 'The first people of the Canadian Arctic and Greenland, arriving from Alaska about 2500 BC. The Dorset culture that followed carved fine ivory figures and hunted seals at their breathing holes; it vanished as the Thule arrived, around 1300.' },
   { id: 'thule-inuit', name: 'Thule & Inuit', start: 800, end: 2010, peak: 1300, region: 'Arctic',
-    capitals: [], place: [-94, 68], covers: { box: [-170, 64, -10, 84] }, match: ['Thule', 'Inuit', 'Inupiat', 'Inupiaq', 'Nunavik', "Yup'ik & Cup'ik"],
+    capitals: [], place: [-94, 68], covers: { box: [-180, 62, -10, 84] }, match: ['Thule', 'Inuit', 'Inupiat', 'Inupiaq', 'Nunavik', "Yup'ik & Cup'ik"],
     summary: 'Ancestors of today’s Inuit. Growing out of the Birnirk culture of Alaska, the Thule people spread across Arctic Canada to Greenland in the 13th century with dog sleds, kayaks, skin boats and toggling harpoons for whaling.' },
   { id: 'norse-greenland', name: 'Norse Greenland', start: 985, end: 1450, peak: 1200, region: 'Arctic',
     capitals: [], place: [-45.5, 61.15], match: [],

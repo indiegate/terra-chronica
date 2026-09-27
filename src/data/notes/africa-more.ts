@@ -19,7 +19,7 @@ export const notes: CivInput[] = [
     capitals: [['Carthage', 10.32, 36.85]], match: ['Vandals'],
     summary: 'The Vandals crossed from Spain in 429 and took Carthage in 439; their fleet sacked Rome in 455. Byzantium reconquered North Africa in 533–34.' },
   { id: 'zayyanids', name: 'Zayyanids of Tlemcen', start: 1236, end: 1556, peak: 1300, region: 'North Africa',
-    capitals: [['Tlemcen', -1.32, 34.88]], match: ['Zayyanid Caliphate'],
+    capitals: [['Tlemcen', -1.32, 34.88]], match: ['Zayyanid Caliphate', 'Abdelouadides'],
     summary: 'A Berber dynasty ruling western Algeria from Tlemcen, a centre of trans-Saharan trade and learning, between the Marinids and the Hafsids, until the Ottomans took it.' },
   { id: 'tunisia', name: 'Tunisia', start: 1574, end: 2010, peak: 1960, region: 'North Africa',
     capitals: [['Tunis', 10.17, 36.8]], match: ['Tunis', 'Tunisia'],
@@ -42,7 +42,7 @@ export const notes: CivInput[] = [
     capitals: [['Ouagadougou', -1.53, 12.37]], match: ['Mossi States'],
     summary: 'Kingdoms of the upper Volta basin, led by the Mogho Naba of Ouagadougou, whose cavalry resisted Mali and Songhai and kept their traditional religion. France conquered them in 1896.' },
   { id: 'oyo', name: 'Oyo Empire', start: 1300, end: 1900, peak: 1750, region: 'West Africa',
-    capitals: [['Oyo-Ile', 4.12, 8.93]], match: ['Oyo', 'Ibadan'],
+    capitals: [['Oyo-Ile', 4.12, 8.93]], match: ['Oyo', 'Ibadan', 'Yoruba kingdoms'],
     summary: 'A Yoruba empire whose cavalry dominated the savanna west of the Niger and made Dahomey pay tribute. It collapsed in the 1830s; Ife, the older Yoruba centre, was famous for its bronze heads.' },
   { id: 'asante', name: 'Akan states & Asante', start: 1400, end: 1902, peak: 1800, region: 'West Africa',
     capitals: [['Kumasi', -1.62, 6.69, 1701, 1902]], place: [-1.62, 6.69], match: ['Akan', 'Asante', 'Fante', 'Akan and Kru states'],
@@ -84,7 +84,7 @@ export const notes: CivInput[] = [
     capitals: [['Ouagadougou', -1.53, 12.37]], match: ['Upper Volta', 'Burkina Faso'],
     summary: 'A French colony created from the Mossi lands in 1919, independent as Upper Volta in 1960 and renamed Burkina Faso by Thomas Sankara in 1984.' },
   { id: 'dahomey', name: 'Dahomey & Benin', start: 1600, end: 2010, peak: 1850, region: 'West Africa',
-    capitals: [['Abomey', 1.99, 7.18, 1645, 1894], ['Porto-Novo', 2.63, 6.5, 1894, 2010]], place: [1.99, 7.18], match: ['Dahomey'],
+    capitals: [['Abomey', 1.99, 7.18, 1645, 1894], ['Porto-Novo', 2.63, 6.5, 1894, 2010]], place: [1.99, 7.18], match: ['Dahomey', 'Benin', 'Cotonou'],
     summary: 'The Fon kingdom of Dahomey, with its women soldiers, grew rich on the slave trade through Ouidah. France conquered it in 1894; independent in 1960, it was renamed Benin in 1975.' },
 
   // ── Central Africa ─────────────────────────────────────────────────────
@@ -116,9 +116,9 @@ export const notes: CivInput[] = [
   { id: 'boer-republics', name: 'Boer republics', start: 1852, end: 1902, peak: 1890, region: 'Southern Africa',
     capitals: [['Pretoria', 28.19, -25.75], ['Bloemfontein', 26.21, -29.12]], place: [28.19, -25.75], match: ['Transvaal', 'Orange Free State'],
     summary: 'Republics founded by Afrikaner trekkers north of the Orange River. Gold found on the Witwatersrand in 1886 drew Britain into the Anglo-Boer War (1899–1902), after which they joined the Union of South Africa.' },
-  { id: 'botswana', name: 'Bechuanaland & Botswana', start: 1885, end: 2010, peak: 1990, region: 'Southern Africa',
+  { id: 'botswana', name: 'Bechuanaland & Botswana', start: 1820, end: 2010, peak: 1990, region: 'Southern Africa',
     capitals: [['Gaborone', 25.91, -24.65, 1965, 2010]], place: [25.91, -24.65], match: ['Bechuanaland', 'Botswana', 'Ngwato'],
-    summary: 'A British protectorate from 1885, sought by Tswana chiefs to keep out Boers and Cecil Rhodes. Independent in 1966, Botswana grew rich on diamonds and has been a stable democracy.' },
+    summary: 'Tswana kingdoms such as the Ngwato under Khama III became a British protectorate in 1885, sought by Tswana chiefs to keep out Boers and Cecil Rhodes. Independent in 1966, Botswana grew rich on diamonds and has been a stable democracy.' },
 ];
 
 export const events: HistoricEvent[] = [

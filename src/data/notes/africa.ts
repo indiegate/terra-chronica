@@ -52,10 +52,10 @@ export const notes: CivInput[] = [
 
   // ── Southern Africa and Madagascar ─────────────────────────────────────
   { id: 'angola', name: 'Angola', start: 1575, end: 2010, peak: 1975, region: 'Central Africa',
-    capitals: [['Luanda', 13.23, -8.84]], match: ['Angola', 'Angola (Portugal)', 'Mbailundu', 'Ovimbundu'],
+    capitals: [['Luanda', 13.23, -8.84]], match: ['Angola', 'Angola (Portugal)', 'Mbailundu', 'Ovimbundu', 'Imbangala'],
     summary: 'Portugal founded Luanda in 1575, and for three centuries Angola was the largest source of enslaved Africans shipped to Brazil. Independence in 1975 was followed by a civil war that lasted until 2002.' },
   { id: 'mozambique', name: 'Mozambique', start: 1505, end: 2010, peak: 1975, region: 'Southern Africa',
-    capitals: [['Lourenço Marques (Maputo)', 32.57, -25.97, 1898, 2010]], place: [40.74, -15.03], match: ['Mozambique', 'Mozambique (Portugal)'],
+    capitals: [['Lourenço Marques (Maputo)', 32.57, -25.97, 1898, 2010]], place: [40.74, -15.03], match: ['Mozambique', 'Mozambique (Portugal)', 'Delagoa Bay'],
     summary: 'Portuguese trading forts from 1505, and later plantation concessions, became the colony of Mozambique. FRELIMO’s war won independence in 1975; a civil war followed until 1992.' },
   { id: 'rhodesias', name: 'Rhodesias & Zambia', start: 1890, end: 2010, peak: 1964, region: 'Southern Africa',
     capitals: [['Lusaka', 28.28, -15.42]], match: ['Rhodesia', 'Northern Rhodesia', 'Zambia', 'Southern Rhodesia', 'Zimbabwe'],
@@ -75,7 +75,7 @@ export const notes: CivInput[] = [
     capitals: [], place: [45.0, 24.0], match: ['Semites', 'Arabian pastoral nomads', 'Arabs', 'Bedouins', "Emirate of Bin Shal'an", 'Hail'],
     summary: 'Herders and oasis farmers of the Arabian peninsula. The domestication of the camel, by about 1000 BC, opened the desert to caravans; Arab tribes, recorded from the 9th century BC, carried Islam out of Arabia in the 7th century AD, while Bedouin confederations ruled the steppe into the 20th.' },
   { id: 'oman-gulf', name: 'Oman & the Gulf', start: -2500, end: 2010, peak: 1850, region: 'Near East',
-    capitals: [['Muscat', 58.59, 23.61]], match: ['Oman', 'Oman and the Aden Protectorate', 'Trucial States', 'Qatar', 'Kuwait', 'United Arab Emirates', 'Mascat', 'Muscat', 'Gharra', 'Muscat and Oman', 'Oman (British Raj)', 'Mazun', 'Trucial Oman'],
+    capitals: [['Muscat', 58.59, 23.61]], match: ['Oman', 'Oman and the Aden Protectorate', 'Trucial States', 'Qatar', 'Kuwait', 'United Arab Emirates', 'Mascat', 'Muscat', 'Gharra', 'Muscat and Oman', 'Oman (British Raj)', 'Mazun', 'Trucial Oman', 'Bahrain'],
     summary: 'Ancient Magan exported copper to Sumer; Ibadi imams ruled inland Oman from the 8th century, and Muscat and Sohar traded across the Indian Ocean. The Ya‘rubi imams expelled the Portuguese from Muscat in 1650 and built a maritime empire reaching Zanzibar. The Gulf sheikhdoms signed truces with Britain from 1820; oil transformed them after 1930, and they became independent between 1961 and 1971.' },
   { id: 'ayyubids', name: 'Ayyubid Sultanate', start: 1171, end: 1260, peak: 1190, region: 'Near East', areas: ['Near East', 'North Africa'],
     capitals: [['Cairo', 31.24, 30.04]], match: ['Ayyubid Sultanate'],

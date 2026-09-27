@@ -57,6 +57,7 @@ export const CORRECTIONS = [
   { years: [-1], from: 'Moche', to: 'Gallinazo culture', why: 'Moche culture begins c. AD 100' },
 
   // ── Late antiquity & medieval ──────────────────────────────────────────
+  { years: [1100, 1200], from: 'Duchy of Benevento', to: 'Papal States', why: 'Benevento passed to the Papacy in 1077' },
   { years: [500, 600], from: 'Tuʻi Tonga Empire', to: 'Tongan chiefdoms', why: 'The Tuʻi Tonga dynasty dates from c. AD 950' },
   { years: [600, 700], from: 'Teotihuacan', to: 'Post-Teotihuacan Basin of Mexico', why: 'Teotihuacan’s centre burned c. 550 and the city lost its power' },
   { years: [700], from: 'Paekche', to: 'Silla', why: 'Baekje fell to Silla and Tang in 660' },
@@ -110,6 +111,11 @@ export const CORRECTIONS = [
   { years: [1300], from: 'Pagan', to: 'Myinsaing and Pinya', why: 'The Pagan kingdom ended in 1297' },
   { years: [1400], from: 'Pagan', to: 'Ava', why: 'The Pagan kingdom ended in 1297; the Ava kingdom ruled Upper Burma from 1364' },
   // ── Early modern ───────────────────────────────────────────────────────
+  { years: [1500, 1530, 1600, 1650, 1700, 1715, 1783, 1800, 1815], from: 'Guanches', to: 'Canary Islands (Spain)', subject: 'Spain', why: 'Castile completed the conquest of the Canaries in 1496' },
+  { years: [1800, 1815], from: 'Venetia', to: 'Venetia (Austria)', subject: 'Austrian Empire', why: 'The Republic of Venice ended in 1797; Austria held the Veneto (French 1805–14)' },
+  { years: [1800, 1815], from: 'Arakan', to: 'Burma', why: 'Burma conquered Arakan in 1784' },
+  { years: [1783, 1800, 1815], from: 'Cochin China', to: 'Đại Việt', why: 'A European name for southern Vietnam; it became a French colony only in 1862' },
+  { years: [1783, 1800], from: 'Africa', to: 'Yoruba kingdoms', why: 'Mislabel: the polygon covers the Ijebu and Ondo Yoruba kingdoms' },
   { years: [1700, 1715], from: 'Arakan (Indian princely state)', to: 'Arakan', why: 'Arakan (Mrauk U) was an independent kingdom until Burma conquered it in 1784' },
   { years: [1783, 1800, 1815], from: 'Sotho', to: 'Niger Delta city-states', why: 'The polygon lies in the Niger Delta (Bonny, Brass, Kalabari); the Sotho live in southern Africa' },
   { years: [1815], from: '       ', to: 'United Kingdom of the Netherlands', why: 'The source leaves NAME blank; its SUBJECTO is the United Kingdom of the Netherlands' },
@@ -130,6 +136,10 @@ export const CORRECTIONS = [
   { years: [1700], from: 'Post-Ming Warlords', to: 'Qing Empire', why: 'The Qing crushed the Three Feudatories in 1681' },
   { years: [1715], from: 'Egypt', to: 'Ottoman Egypt', subject: 'Ottoman Empire', why: 'An Ottoman province from 1517' },
   // ── Modern ─────────────────────────────────────────────────────────────
+  { years: [1900], from: 'Kingdom of Hawaii', to: 'Hawaii (USA)', subject: 'United States', why: 'The United States annexed Hawaii in 1898' },
+  { years: [1900], from: 'Futa Toro', to: 'French West Africa', subject: 'France', why: 'France annexed Futa Toro by 1890' },
+  { years: [1900], from: 'Futa Jalon', to: 'French West Africa', subject: 'France', why: 'France annexed Futa Jalon in 1896' },
+  { years: [1900], from: 'Kong', to: 'French West Africa', subject: 'France', why: 'Samori destroyed Kong in 1897; France took the region' },
   { years: [1880], from: 'Ivory Coast', to: 'Akan and Kru states', why: 'France made the Ivory Coast a colony in 1893; in 1880 the region was ruled by Akan kingdoms and Kru communities' },
   { years: [1900], from: 'Tukular Caliphate', to: 'French West Africa', subject: 'France', why: 'France defeated the Toucouleur Empire in 1890–93' },
   { years: [1900], from: 'Second Samori Empire', to: 'French West Africa', subject: 'France', why: 'France captured Samori Ture in 1898' },
@@ -234,6 +244,10 @@ export const CORRECTIONS = [
 // so they flicker in and out as a "country" when scrubbing.
 export const REMOVALS = [
   { years: [1945, 1960], name: 'Antarctica', why: 'Never a state; the land is drawn by the coastline layer at every date' },
+  { years: [-100], name: 'Hövsgöl Nuur', why: 'A lake, not a polity' },
+  { years: [-1500], name: 'Guanches', why: 'The Canary Islands were first settled in the 1st millennium BC' },
+  { years: [700], name: 'Lake Vygozero', why: 'A lake, not a polity' },
+  { years: [700], name: 'Lake Segozerskoye', why: 'A lake, not a polity' },
   { years: [-5000], name: 'Kelteminar', why: 'A copy of the Central Asian Kelteminar culture drawn on New Zealand, which was uninhabited until c. AD 1280' },
 ];
 
