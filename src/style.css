@@ -494,27 +494,21 @@ html, body {
   padding: 3px 4px;
 }
 
-/* Two stacked sliders: geological time above, human history below. Only one
-   is active; the other is dimmed until touched. */
-.sliders { display: flex; flex-direction: column; gap: 6px; min-width: 0; }
-#timeline,
-#deepline {
+/* Three stacked sliders: geological time, human prehistory, human history.
+   Only one is active; the others are dimmed until touched, their handles kept
+   on the same moment as far as their range allows. */
+.sliders { display: flex; flex-direction: column; gap: 4px; min-width: 0; }
+.sliders > div {
   position: relative;
+  height: 46px;
   min-width: 0;
   cursor: ew-resize;
   user-select: none;
   transition: opacity 0.25s;
 }
-#timeline,
-#deepline { height: 50px; }
-
-/* Inactive slider: dimmed; its handle waits at "today" (deep) or the last year (history). */
-body:not(.deep) #deepline { opacity: 0.55; }
-body:not(.deep) #deepline .handle { opacity: 0.4; }
-body.deep #timeline { opacity: 0.45; }
-body.deep #timeline .handle { opacity: 0.35; }
-#deepline:hover,
-#timeline:hover { opacity: 1; }
+.sliders > div:not(.active) { opacity: 0.5; }
+.sliders > div:not(.active) .handle { opacity: 0.4; }
+.sliders > div:hover { opacity: 1; }
 
 .year small {
   font-family: var(--ui);
@@ -573,6 +567,48 @@ body.deep #timeline .handle { opacity: 0.35; }
 .deep-time .dino-key.shown { display: block; }
 .dino-key div { display: flex; align-items: center; gap: 6px; line-height: 1.55; }
 .dino-key svg { width: 26px; height: 16px; fill: currentColor; }
+
+/* Human prehistory: species ranges, sites and dispersal routes. */
+.hom-range {
+  fill: var(--c);
+  fill-opacity: 0.1;
+  stroke: var(--c);
+  stroke-opacity: 0.55;
+  stroke-width: 1;
+  stroke-dasharray: 4 3;
+  vector-effect: non-scaling-stroke;
+}
+.hom-range-label {
+  font-family: var(--sc);
+  fill: var(--c);
+  fill-opacity: 0.85;
+  text-anchor: middle;
+  letter-spacing: 0.06em;
+  pointer-events: none;
+  paint-order: stroke;
+  stroke: var(--paper-light);
+  stroke-opacity: 0.7;
+  stroke-width: calc(3px / var(--k));
+}
+.hom-route {
+  fill: none;
+  stroke: var(--c);
+  stroke-width: 2;
+  stroke-opacity: 0.85;
+  stroke-linecap: round;
+  stroke-dasharray: 7 4;
+  vector-effect: non-scaling-stroke;
+}
+.hom-route.done { stroke-opacity: 0.4; }
+.hom-arrow path { fill: var(--c); }
+.hom-site { cursor: pointer; }
+.hom-site circle { fill: var(--c); fill-opacity: 0.35; stroke: var(--paper-light); stroke-width: 1; }
+.hom-site text { display: none; font-family: var(--ui); font-size: 11.5px; fill: var(--ink); paint-order: stroke; stroke: var(--paper-light); stroke-width: 3px; }
+.hom-site.now circle { fill-opacity: 1; stroke: var(--ink); }
+.hom-site.now text { display: block; }
+.hom-site.now text.hidden { display: none; }
+.hom-site:hover circle { stroke: var(--rubric); stroke-width: 2; }
+.info .dot { display: inline-block; width: 9px; height: 9px; margin-right: 6px; border-radius: 50%; background: var(--c); }
 
 /* Chicxulub impact overlay */
 .impact { position: absolute; inset: 0; z-index: 3; pointer-events: none; overflow: visible; }

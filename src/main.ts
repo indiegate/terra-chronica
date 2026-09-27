@@ -5,7 +5,8 @@ import { CIVILISATIONS, ERAS, EVENTS, capitalAt, type Civilisation } from './dat
 import { GEO_EVENTS, MAX_AGE, PERIODS, ageParts, formatAge, formatAgeShort, periodAt } from './data/geology';
 import { formatSpan, formatYear, inkFor } from './format';
 import { LayersPanel } from './layers/panel';
-import { FIRST_YEAR, LAST_YEAR, deepTime, historyTime } from './time';
+import { EPOCHS, PRE_END, PRE_EVENTS, PRE_START, SITES, SPECIES_BY_ID, epochAt, siteState, speciesAt, stageAt, type Site } from './data/prehistory';
+import { FIRST_YEAR, LAST_YEAR, deepTime, historyTime, prehistoryTime } from './time';
 
 const $ = <T extends HTMLElement>(sel: string) => document.querySelector<T>(sel)!;
 
@@ -51,6 +52,36 @@ const deepline = new Timeline($('#deepline'), {
   tickFormat: formatAgeShort,
 });
 
+// Prehistory: log scale of years before present, from the first hominins to 10,000 BC.
+const LOG_START = Math.log(PRE_START);
+const LOG_END = Math.log(PRE_END);
+const clampBP = (bp: number) => Math.max(PRE_END, Math.min(PRE_START, bp));
+
+/** A number of years ago, split into number and unit for the date read-out. */
+function yearsAgoParts(bp: number): [string, string] {
+  if (bp >= 1e6) return [(bp / 1e6).toFixed(2).replace(/\.?0+$/, ''), 'million years ago'];
+  const step = bp >= 100_000 ? 1000 : 100;
+  return [(Math.round(bp / step) * step).toLocaleString('en-GB'), 'years ago'];
+}
+const formatYearsAgo = (bp: number) => (bp <= PRE_END ? '10,000 BC' : yearsAgoParts(bp).join(' '));
+
+const preline = new Timeline($('#preline'), {
+  toPos: (bp) => (LOG_START - Math.log(clampBP(bp))) / (LOG_START - LOG_END),
+  fromPos: (p) => clampBP(Math.exp(LOG_START - p * (LOG_START - LOG_END))),
+  round: (bp) => {
+    const step = bp >= 1e6 ? 10_000 : bp >= 100_000 ? 1000 : bp >= 20_000 ? 100 : 50;
+    return clampBP(Math.round(bp / step) * step);
+  },
+  bands: EPOCHS.map((e) => ({ ...e, color: `color-mix(in srgb, ${e.color} 40%, #f6eedb)` })),
+  events: PRE_EVENTS,
+  ticks: [7e6, 5e6, 3e6, 2e6, 1e6, 500e3, 300e3, 200e3, 100e3, 50e3, 30e3, 20e3, PRE_END],
+  format: formatYearsAgo,
+  tickFormat: (bp) => (bp >= 1e6 ? `${bp / 1e6} Ma` : `${Math.round(bp / 1000)} ka`),
+});
+
+const deeplineEl = $('#deepline');
+const prelineEl = $('#preline');
+const timelineEl = $('#timeline');
 const yearEl = $('#year');
 const eraEl = $('#era');
 const surveyEl = $('#survey');
@@ -58,12 +89,16 @@ const playBtn = $<HTMLButtonElement>('#play');
 const speedSel = $<HTMLSelectElement>('#speed');
 const info = $('#info');
 
+/** Which slider is in charge. */
+type Mode = 'deep' | 'pre' | 'history';
+
 let snapshots: number[] = [];
+let mode: Mode = 'history';
 let year = 117;
-/** Geological age in millions of years; 0 means the human-history view. */
+/** Geological age in millions of years while in deep time; 0 otherwise. */
 let age = 0;
-/** Whether the map is currently showing deep time (can lag `age` while the URL is re-read). */
-let inDeepTime = false;
+/** Years before present on the prehistory slider. */
+let preBP = PRE_START;
 let playing = false;
 let lastFrame = 0;
 
@@ -113,27 +148,51 @@ layersPanel.onToggle = (id, on) => {
 
 // ── URL ─────────────────────────────────────────────────────────────────
 
-readHash();
+const urlMode = readHash();
 
-function readHash() {
+/** Read the date and layers from the URL; returns the slider it names. */
+function readHash(): Mode {
   const a = location.hash.match(/age=([\d.]+)/);
+  const k = location.hash.match(/ka=([\d.]+)/);
   const y = location.hash.match(/year=(-?\d+)/);
   const l = location.hash.match(/layers=([\w,-]*)/);
   age = a ? Math.max(0, Math.min(MAX_AGE, Number(a[1]) || 0)) : 0;
+  if (k) preBP = clampBP((Number(k[1]) || 0) * 1000);
   if (y) year = Math.max(MIN_YEAR, Math.min(MAX_YEAR, Number(y[1]) || 1));
   applyLayers(l ? new Set(l[1].split(',').filter(Boolean)) : null);
+  return age > 0 ? 'deep' : k ? 'pre' : 'history';
 }
 
 function writeHash() {
-  const time = inDeepTime ? `age=${age}` : `year=${year}`;
+  const time = mode === 'deep' ? `age=${age}` : mode === 'pre' ? `ka=${+(preBP / 1000).toFixed(3)}` : `year=${year}`;
   const layers = layersParam();
   history.replaceState(null, '', `#${time}${layers !== null ? `&layers=${layers}` : ''}`);
 }
 
+/** Hand control to one slider; the others dim. Leaving deep time or prehistory restores the borders. */
+function enterMode(m: Mode) {
+  if (mode === m) return;
+  const wasGeo = mode !== 'history';
+  mode = m;
+  if (m !== 'deep') age = 0;
+  document.body.classList.toggle('deep', m === 'deep');
+  document.body.classList.toggle('pre', m === 'pre');
+  info.classList.remove('open', 'period', 'epoch');
+  if (m === 'history' && wasGeo) void map.setGeoAge(0);
+}
+
+/** Keep every slider's handle on the same moment, as far as its range allows. */
+function syncHandles() {
+  deepline.setValue(mode === 'deep' ? age : mode === 'pre' ? preBP / 1e6 : 0);
+  preline.setValue(mode === 'pre' ? preBP : mode === 'deep' ? clampBP(age * 1e6) : PRE_END);
+  timeline.setValue(mode === 'history' ? year : MIN_YEAR);
+  for (const [el, m] of [[deeplineEl, 'deep'], [prelineEl, 'pre'], [timelineEl, 'history']] as const) el.classList.toggle('active', m === mode);
+}
+
 async function setYear(y: number) {
+  enterMode('history');
   year = Math.round(y) || 1;
-  if (inDeepTime) leaveDeepTime();
-  timeline.setValue(year);
+  syncHandles();
   yearEl.textContent = formatYear(year);
   const era = ERAS.find((e) => year >= e.start && year < e.end) ?? ERAS[ERAS.length - 1];
   eraEl.textContent = era.name;
@@ -155,14 +214,11 @@ async function setYear(y: number) {
 
 /** Show land as it was `a` million years ago; 0 returns to human history. */
 async function setAge(a: number) {
-  age = Math.max(0, Math.min(MAX_AGE, a));
-  deepline.setValue(age);
-  if (age <= 0) {
-    leaveDeepTime();
-    return setYear(year);
-  }
-  inDeepTime = true;
-  document.body.classList.add('deep');
+  const next = Math.max(0, Math.min(MAX_AGE, a));
+  if (next <= 0) return setYear(year);
+  enterMode('deep');
+  age = next;
+  syncHandles();
   const period = periodAt(age);
   const [num, unit] = ageParts(age);
   yearEl.innerHTML = `${esc(num)} <small>${esc(unit)}</small>`;
@@ -174,13 +230,20 @@ async function setAge(a: number) {
   await map.setGeoAge(age);
 }
 
-function leaveDeepTime() {
-  inDeepTime = false;
-  age = 0;
-  deepline.setValue(0);
-  document.body.classList.remove('deep');
-  info.classList.remove('open', 'period');
-  void map.setGeoAge(0);
+/** Show the world `bp` years ago on the prehistory slider. */
+async function setPre(bp: number) {
+  enterMode('pre');
+  preBP = clampBP(bp);
+  syncHandles();
+  const [num, unit] = yearsAgoParts(preBP);
+  yearEl.innerHTML = `${esc(num)} <small>${esc(unit)}</small>`;
+  eraEl.textContent = epochAt(preBP).name;
+  surveyEl.textContent = stageAt(preBP).name;
+  writeHash();
+  const t = prehistoryTime(preBP);
+  layersPanel.setTime(t);
+  if (info.classList.contains('epoch')) renderEpoch();
+  await map.setGeoAge(preBP / 1e6, t);
 }
 
 // ── Playback ────────────────────────────────────────────────────────────
@@ -191,11 +254,15 @@ function tick(now: number) {
   lastFrame = now;
   // Speed is measured along the slider so every stretch of time gets equal screen time.
   const rate = 0.012 * Number(speedSel.value);
-  if (age > 0) {
-    const p = deepline.toPos(age) + rate * dt;
-    // Deep time flows straight into human history.
+  if (mode === 'deep') {
+    const next = deepline.fromPos(deepline.toPos(age) + rate * dt);
+    // Deep time flows on into prehistory, and prehistory into human history.
+    if (next * 1e6 <= PRE_START) void setPre(PRE_START);
+    else void setAge(next);
+  } else if (mode === 'pre') {
+    const p = preline.toPos(preBP) + rate * dt;
     if (p >= 1) void setYear(MIN_YEAR);
-    else void setAge(deepline.fromPos(p));
+    else void setPre(preline.fromPos(p));
   } else {
     let p = timeline.toPos(year) + rate * dt;
     if (p >= 1) {
@@ -208,7 +275,7 @@ function tick(now: number) {
 }
 
 function play() {
-  if (age <= 0 && year >= MAX_YEAR) void setYear(MIN_YEAR);
+  if (mode === 'history' && year >= MAX_YEAR) void setYear(MIN_YEAR);
   playing = true;
   playBtn.classList.add('playing');
   playBtn.setAttribute('aria-label', 'Pause');
@@ -229,6 +296,8 @@ timeline.onScrubStart = stop;
 timeline.onChange = (y) => void setYear(y);
 deepline.onScrubStart = stop;
 deepline.onChange = (a) => void setAge(a);
+preline.onScrubStart = stop;
+preline.onChange = (bp) => void setPre(bp);
 
 document.addEventListener('keydown', (e) => {
   if ((e.target as HTMLElement).closest('input, select')) return;
@@ -238,8 +307,10 @@ document.addEventListener('keydown', (e) => {
   } else if (e.key === 'ArrowRight' || e.key === 'ArrowLeft') {
     stop();
     const dir = e.key === 'ArrowRight' ? 1 : -1;
-    if (age > 0) {
+    if (mode === 'deep') {
       void setAge(deepline.fromPos(deepline.toPos(age) + dir * 0.004));
+    } else if (mode === 'pre') {
+      void setPre(preline.fromPos(preline.toPos(preBP) + dir * 0.004));
     } else if (e.shiftKey) {
       // Jump to the next / previous surveyed snapshot.
       const next = dir > 0 ? snapshots.find((s) => s > year) : [...snapshots].reverse().find((s) => s < year);
@@ -280,10 +351,10 @@ function seatList(civ: Civilisation) {
 
 function renderInfo(hit: TerritoryHit | null) {
   if (!hit) {
-    info.classList.remove('open', 'period');
+    info.classList.remove('open', 'period', 'epoch');
     return;
   }
-  info.classList.remove('period');
+  info.classList.remove('period', 'epoch');
   const civ = hit.civ;
   const title = civ?.name ?? hit.name;
   const ink = inkFor(civ?.id ?? hit.subjectOf ?? hit.name);
@@ -339,9 +410,75 @@ function renderPeriod() {
   info.querySelector('.close')!.addEventListener('click', () => info.classList.remove('open', 'period'));
 }
 
+/** A span of years ago, e.g. "3.2 – 3.18 million years ago" or "46,000 – 43,000 years ago". */
+function spanAgo(from: number, to: number) {
+  const [a, unitA] = yearsAgoParts(from);
+  const [b, unitB] = yearsAgoParts(to);
+  if (a === b && unitA === unitB) return `${a} ${unitA}`;
+  return unitA === unitB ? `${a} – ${b} ${unitA}` : `${a} ${unitA} – ${b} ${unitB}`;
+}
+
+/** Epoch card, shown when the map is clicked in prehistory: who was alive and where. */
+function renderEpoch() {
+  const ep = epochAt(preBP);
+  const alive = speciesAt(preBP);
+  const sites = SITES.filter((s) => siteState(s, preBP) === 'now');
+  const swatch = (c: string) => `<span class="dot" style="--c:${c}"></span>`;
+  info.innerHTML = `
+    <button class="close" aria-label="Close">×</button>
+    <div class="swatch" style="--fill:${ep.color}"></div>
+    <h2>${esc(ep.name)}</h2>
+    <p class="summary">${esc(formatYearsAgo(preBP))} · ${esc(stageAt(preBP).name)}</p>
+    <dl>
+      <dt>Span</dt><dd>${spanAgo(ep.start, ep.end)}</dd>
+      ${alive.length ? `<dt>Human species</dt><dd>${alive.map((s) => `${swatch(s.color)}${esc(s.name)} <span class="muted">${esc(s.note)}</span>`).join('<br>')}</dd>` : ''}
+      ${sites.length ? `<dt>Sites of this time</dt><dd>${sites.map((s, i) => `<a href="#" data-site="${i}">${esc(s.name)}</a>`).join('<br>')}</dd>` : ''}
+    </dl>
+    <div class="actions">
+      <a class="btn" href="${wikiLink(ep.name)}" target="_blank" rel="noopener">Read more ↗</a>
+    </div>`;
+  info.classList.add('open', 'epoch');
+  info.querySelector('.close')!.addEventListener('click', () => info.classList.remove('open', 'epoch'));
+  info.querySelectorAll<HTMLAnchorElement>('[data-site]').forEach((a) =>
+    a.addEventListener('click', (e) => {
+      e.preventDefault();
+      renderSite(sites[Number(a.dataset.site)]);
+    }),
+  );
+}
+
+/** Card for one hominin site. */
+function renderSite(site: Site) {
+  const sp = SPECIES_BY_ID.get(site.species)!;
+  info.innerHTML = `
+    <button class="close" aria-label="Close">×</button>
+    <div class="swatch" style="--fill:${sp.color}"></div>
+    <h2>${esc(site.name)}</h2>
+    <p class="summary">${esc(site.summary)}</p>
+    <dl>
+      <dt>Date</dt><dd>${spanAgo(site.from, site.to)}</dd>
+      <dt>Species</dt><dd>${esc(sp.name)} <span class="muted">${esc(sp.note)}</span></dd>
+    </dl>
+    <div class="actions">
+      <button class="btn" data-act="go">Go to this time</button>
+      <a class="btn" href="${wikiLink(site.name)}" target="_blank" rel="noopener">Read more ↗</a>
+    </div>`;
+  info.classList.remove('epoch', 'period');
+  info.classList.add('open');
+  info.querySelector('.close')!.addEventListener('click', () => info.classList.remove('open'));
+  info.querySelector('[data-act="go"]')!.addEventListener('click', () => {
+    stop();
+    void setPre(Math.sqrt(site.from * site.to));
+  });
+}
+
+map.onSite = (site) => renderSite(site);
+
 // The map's own click handler runs first and clears any selection.
 $('#map').addEventListener('click', (e) => {
-  if (age > 0 && !(e.target as Element).closest('.info, .zoom-controls, .playbar')) renderPeriod();
+  if ((e.target as Element).closest('.info, .zoom-controls, .playbar, .layers-panel')) return;
+  if (mode === 'deep') renderPeriod();
+  else if (mode === 'pre') renderEpoch();
 });
 
 // ── Search ──────────────────────────────────────────────────────────────
@@ -455,11 +592,11 @@ async function goToName(n: string) {
 }
 
 window.addEventListener('hashchange', () => {
-  const [prevYear, prevAge] = [year, age];
-  readHash();
-  if (year === prevYear && age === prevAge) return;
+  const before = [mode, year, age, preBP].join();
+  const want = readHash();
+  if ([want, year, age, preBP].join() === before) return;
   stop();
-  void (age > 0 ? setAge(age) : setYear(year));
+  void (want === 'deep' ? setAge(age) : want === 'pre' ? setPre(preBP) : setYear(year));
 });
 
 // ── Boot ────────────────────────────────────────────────────────────────
@@ -468,9 +605,10 @@ window.addEventListener('hashchange', () => {
   [snapshots, nameIndex] = await Promise.all([loadManifest(), loadNameIndex()]);
   snapshots = snapshots.filter((y) => y >= MIN_YEAR);
   timeline.setSnaps(snapshots);
-  const startAge = age;
+  const [startAge, startBP] = [age, preBP];
   await setYear(year);
-  if (startAge > 0) await setAge(startAge);
+  if (urlMode === 'deep') await setAge(startAge);
+  else if (urlMode === 'pre') await setPre(startBP);
   document.body.classList.add('ready');
 })();
 

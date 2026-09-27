@@ -16,6 +16,8 @@ export interface MapLayer {
   update(t: TimeState): void;
   /** Zoom factor changed (for overlays kept at a constant screen size). */
   scale?(k: number): void;
+  /** The map was resized (the projection changed). */
+  resize?(): void;
 }
 
 /** A layer that only shows or hides something MapView already draws. */

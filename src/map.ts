@@ -10,6 +10,8 @@ import { Renderer, type Colours, type LandLayer, type RGBA, type TerritoryLayer,
 import type { LandMesh, TerritoryMesh, TerritoryMeta, WorkerRequest } from './gl/types';
 import { toggleLayer, type MapLayer } from './layers/layer';
 import { HISTORY_SPAN, deepTime, historyTime, type TimeState } from './time';
+import { HomininSites, Journeys, SpeciesRanges } from './layers/prehistory';
+import { PRE_END, type Site } from './data/prehistory';
 
 /*
  * The map is drawn with WebGL (see gl/renderer.ts): land comes from Natural
@@ -115,6 +117,8 @@ export class MapView {
   private colours: Record<'ink' | 'land' | 'inkSoft' | 'sea' | 'seaInk', number[]>;
 
   onSelect: (hit: TerritoryHit | null) => void = () => {};
+  /** A hominin site was clicked. */
+  onSite: (site: Site) => void = () => {};
 
   constructor(private host: HTMLElement) {
     const css = getComputedStyle(document.documentElement);
@@ -144,6 +148,7 @@ export class MapView {
     this.capitalRoot = this.world.append('g').attr('class', 'capitals');
     this.labelRoot = this.world.append('g').attr('class', 'labels');
     const dinoRoot = this.world.insert('g', '.labels').attr('class', 'dino-root');
+    const prehistoryRoot = this.world.insert('g', '.labels').attr('class', 'prehistory');
     this.paleoRoot = this.world.append('g').attr('class', 'paleo-labels');
     this.dinos = new Dinosaurs(
       this.svg,
@@ -170,11 +175,19 @@ export class MapView {
     );
     this.addLayer(
       toggleLayer(
-        { id: 'paleo-names', title: 'Past continents & oceans', group: 'earth', span: { fromBP: 1000e6, toBP: 0, mode: 'deep' }, defaultOn: true },
+        { id: 'paleo-names', title: 'Past continents & oceans', group: 'earth', span: { fromBP: 1000e6, toBP: PRE_END }, defaultOn: true },
         (on) => void this.paleoRoot.classed('layer-off', !on),
       ),
     );
     this.addLayer(this.dinos);
+    const ctx = {
+      root: prehistoryRoot,
+      project: (lon: number, lat: number) => this.projection([lon, lat]) as [number, number] | null,
+      geoPath: () => d3.geoPath(this.projection),
+    };
+    const sites = new HomininSites(ctx);
+    sites.onSelect = (s) => this.onSite(s);
+    for (const layer of [new SpeciesRanges(ctx), new Journeys(ctx), sites]) this.addLayer(layer);
 
     this.tooltip = document.createElement('div');
     this.tooltip.className = 'map-tooltip';
@@ -290,6 +303,7 @@ export class MapView {
     this.layoutLabels();
     this.renderPaleoLabels();
     this.dinos?.render();
+    for (const layer of this.layers) layer.resize?.();
     this.invalidate();
   }
 
@@ -397,11 +411,11 @@ export class MapView {
    * Show land as it was `ma` million years ago. Territories, labels and
    * capitals are hidden for any age above zero (they belong to human history).
    */
-  async setGeoAge(ma: number) {
+  async setGeoAge(ma: number, time?: TimeState) {
     await this.ready;
     const previous = this.age;
     this.age = Math.max(0, ma);
-    this.time = this.age > 0 ? deepTime(this.age) : historyTime(this.year);
+    this.time = time ?? (this.age > 0 ? deepTime(this.age) : historyTime(this.year));
     this.plates!.setAge(this.age);
     const quats = new Float32Array(this.plateIds.length * 4);
     this.plateIds.forEach((id, i) => quats.set(this.plates!.rotation(id), i * 4));

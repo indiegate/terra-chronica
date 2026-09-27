@@ -15,7 +15,7 @@ export const PRESENT = 1950;
 export const FIRST_YEAR = -10000;
 export const LAST_YEAR = 2010;
 
-export type TimeMode = 'deep' | 'history';
+export type TimeMode = 'deep' | 'prehistory' | 'history';
 
 export interface TimeState {
   /** Years before AD 1950; negative after it. */
@@ -33,6 +33,10 @@ export function historyTime(year: number): TimeState {
 
 export function deepTime(ma: number): TimeState {
   return { bp: ma * 1e6, year: null, age: ma, mode: 'deep' };
+}
+
+export function prehistoryTime(bp: number): TimeState {
+  return { bp, year: null, age: bp / 1e6, mode: 'prehistory' };
 }
 
 /** Human-readable date for a BP value, in the units a reader expects at that depth. */

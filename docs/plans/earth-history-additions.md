@@ -295,6 +295,13 @@ This is the most important physical layer, because it fixes what the map shows a
 
 ## 6. Human prehistory (7 million years ago to 10,000 BC)
 
+> **Progress (2026-09-27):** done, except the land bridges. Built so far:
+> - The third slider (`#preline`, log scale), with epochs as bands, tool stages in the read-out, 27 milestones, and playback flowing deep time → prehistory → history.
+> - 65 sites, species ranges for 10 groups (Homo sapiens spreading region by region), and 8 routes (`src/data/prehistory.ts`, `src/layers/prehistory.ts`).
+> - Site cards, and an epoch card on map click.
+>
+> Routes still cross today's coastlines; they pick up Beringia and Sahul when section 3 adds Ice Age sea levels. The megafauna idea from section 2 is not started.
+
 ### 6.1 A third slider
 - On the square-root deep-time scale, the last 300,000 years get 1.7% of the width. That is unusable.
 - Add a **Prehistory** `Timeline` between the two existing sliders, on a log scale from 7 million years ago to 11,950 years ago (10,000 BC).
