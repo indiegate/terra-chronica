@@ -163,7 +163,7 @@ const DATA: CivInput[] = [
     match: ['Eastern Roman Empire', 'Byzantine Empire'],
     summary: 'The eastern half of the Roman Empire, which survived a thousand years after the fall of the west and preserved Greek learning.' },
   { id: 'ghana', name: 'Ghana Empire', start: 300, end: 1240, peak: 1000, region: 'West Africa',
-    capitals: [['Koumbi Saleh', -7.99, 15.77]], match: ['Empire of Ghana'],
+    capitals: [['Koumbi Saleh', -7.99, 15.77]], match: ['Empire of Ghana', 'Ghana'],
     summary: 'The “land of gold”, a Sahelian empire that grew rich from trans-Saharan trade in gold and salt.' },
   { id: 'franks', name: 'Frankish Realm', start: 481, end: 987, peak: 814, region: 'Western Europe',
     capitals: [['Tournai', 3.39, 50.61, 481, 508], ['Paris', 2.35, 48.86, 508, 794], ['Aachen', 6.08, 50.78, 794, 888]],
@@ -180,7 +180,7 @@ const DATA: CivInput[] = [
     match: ['Umayyad Caliphate', 'Abbasid Caliphate'],
     summary: 'The Umayyad and Abbasid caliphates stretched from Iberia to the Indus; Abbasid Baghdad’s House of Wisdom became a centre of learning.' },
   { id: 'khazars', name: 'Khazar Khaganate', start: 600, end: 1016, peak: 850, region: 'Steppe',
-    capitals: [['Atil (site uncertain)', 47.9, 46.4]], match: ['Khazars'],
+    capitals: [['Atil (site uncertain)', 47.9, 46.4]], match: ['Khazars', 'Huns', 'Sabirs'],
     summary: 'A Turkic steppe power between the Black and Caspian seas whose elite adopted Judaism.' },
   { id: 'tiwanaku', name: 'Tiwanaku & Wari', start: 500, end: 1000, peak: 750, region: 'Andes',
     capitals: [['Tiwanaku', -68.67, -16.55]], match: ['Tiahuanaco Empire', 'Huari Empire'],
@@ -196,7 +196,7 @@ const DATA: CivInput[] = [
     summary: 'A federation of East Slavic principalities founded by Varangian rulers, which adopted Orthodox Christianity in 988.' },
   { id: 'hre', name: 'Holy Roman Empire', start: 962, end: 1806, peak: 1200, region: 'Central Europe',
     capitals: [['Aachen (coronations)', 6.08, 50.78, 962, 1346], ['Prague', 14.42, 50.09, 1346, 1438], ['Vienna', 16.37, 48.21, 1438, 1806]],
-    match: ['Holy Roman Empire'],
+    match: ['Holy Roman Empire', 'Burgandy', 'Duchy of Swabia'],
     summary: 'A complex union of German, Italian and Central European territories under an elected emperor, with no fixed capital for most of its history.' },
   { id: 'song', name: 'Song China', start: 960, end: 1279, peak: 1100, region: 'East Asia',
     capitals: [['Kaifeng', 114.31, 34.8, 960, 1127], ['Hangzhou', 120.15, 30.27, 1127, 1279]],
@@ -228,7 +228,7 @@ const DATA: CivInput[] = [
     capitals: [['Great Zimbabwe', 30.93, -20.27]], match: ['Great Zimbabwe'],
     summary: 'A Shona kingdom whose dry-stone city controlled gold trade with the Swahili coast.' },
   { id: 'delhi', name: 'Delhi Sultanate', start: 1206, end: 1526, peak: 1330, region: 'South Asia',
-    capitals: [['Delhi', 77.21, 28.61]], match: ['Sultanate of Delhi'],
+    capitals: [['Delhi', 77.21, 28.61]], match: ['Sultanate of Delhi', 'Punjab'],
     summary: 'A succession of Turkic and Afghan dynasties that ruled northern India and repelled Mongol invasions.' },
   { id: 'mamluk', name: 'Mamluk Sultanate', start: 1250, end: 1517, peak: 1300, region: 'Near East',
     capitals: [['Cairo', 31.24, 30.04]], match: ['Mamluke Sultanate'],
@@ -281,7 +281,7 @@ const DATA: CivInput[] = [
     summary: 'A Persianate dynasty that ruled most of South Asia and built the Taj Mahal.' },
   { id: 'russia', name: 'Russian Empire', start: 1547, end: 1917, peak: 1866, region: 'Eurasia', areas: ['Europe', 'Steppe & Central Asia'],
     capitals: [['Moscow', 37.62, 55.76, 1547, 1712], ['St Petersburg', 30.32, 59.94, 1712, 1728], ['Moscow', 37.62, 55.76, 1728, 1732], ['St Petersburg', 30.32, 59.94, 1732, 1917]],
-    match: ['Tsardom of Muscovy', 'Russian Empire'],
+    match: ['Tsardom of Muscovy', 'Russian Empire', 'Sakhalin (RU)'],
     summary: 'From the Tsardom of Muscovy to a transcontinental empire reaching the Pacific and Alaska.' },
   { id: 'qing', name: 'Qing China', start: 1644, end: 1912, peak: 1790, region: 'East Asia',
     capitals: [['Beijing', 116.4, 39.9]], match: ['Qing Empire'],
@@ -317,7 +317,8 @@ export function capitalAt(c: Civilisation, year: number): Capital | undefined {
 
 const byMatch = new Map<string, Civilisation[]>();
 for (const c of CIVILISATIONS) for (const n of c.match) {
-  const key = n.toLowerCase();
+  // Some source names carry stray spaces; civFor trims the name it looks up, so trim here too.
+  const key = n.trim().toLowerCase();
   byMatch.set(key, [...(byMatch.get(key) ?? []), c]);
 }
 

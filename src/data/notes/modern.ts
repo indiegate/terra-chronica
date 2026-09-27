@@ -80,7 +80,7 @@ export const notes: CivInput[] = [
     summary: 'The Ottoman Regency of Algiers (1516–1830) was a base for Barbary corsairs. France invaded in 1830 and made Algeria part of France, settling a million Europeans. The war of independence of 1954–62 killed hundreds of thousands; a civil war between the army and Islamists followed in the 1990s.' },
   { id: 'morocco', name: 'Morocco', start: 1244, end: 2010, peak: 1600, region: 'North Africa',
     capitals: [['Fez', -4.98, 34.03, 1244, 1549], ['Marrakesh', -7.99, 31.63, 1549, 1659], ['Meknes', -5.55, 33.9, 1672, 1727], ['Fez', -4.98, 34.03, 1727, 1912], ['Rabat', -6.84, 34.02, 1912, 2010]],
-    match: ['Morocco', 'Morocco (France)', 'Merinides', 'Wattasid Caliphate', 'Watassid Morocco'],
+    match: ['Morocco', 'Morocco (France)', 'Merinides', 'Wattasid Caliphate', 'Watassid Morocco', 'Spanish Morocco'],
     summary: 'The Marinid, Saadi and Alaouite dynasties ruled Morocco from Fez and Marrakesh; the Saadis defeated Portugal in 1578 and conquered Songhai in 1591. A French and Spanish protectorate from 1912, it became independent in 1956.' },
 
   // ── Sub-Saharan Africa ─────────────────────────────────────────────────
@@ -91,13 +91,13 @@ export const notes: CivInput[] = [
     capitals: [['Léopoldville (Kinshasa)', 15.31, -4.32]], match: ['Zaire (Belgium)', 'Belgian Congo', 'Republic of the Congo (Léopoldville)', 'Zaire', 'DR Congo'],
     summary: 'King Leopold II’s Congo Free State (1885–1908) forced rubber collection with atrocities that killed millions. Belgium ruled it until 1960; Mobutu’s Zaire (1965–97) was followed by wars that drew in its neighbours.' },
   { id: 'rep-congo', name: 'French Congo & Republic of the Congo', start: 1880, end: 2010, peak: 1960, region: 'Central Africa',
-    capitals: [['Brazzaville', 15.28, -4.27]], match: ['Congo', 'Congo (France)', 'Middle Congo'],
+    capitals: [['Brazzaville', 15.28, -4.27]], match: ['Congo', 'Congo (France)', 'Middle Congo', 'Teke'],
     summary: 'Pierre de Brazza’s treaties with the Teke king in 1880 began the French colony, the capital of French Equatorial Africa. Independent in 1960.' },
   { id: 'nigeria', name: 'Nigeria', start: 1914, end: 2010, peak: 2000, region: 'West Africa',
     capitals: [['Lagos', 3.38, 6.45, 1914, 1991], ['Abuja', 7.49, 9.06, 1991, 2010]], match: ['Nigeria'],
     summary: 'Britain joined its northern and southern protectorates into Nigeria in 1914. Independent in 1960, Africa’s most populous country went through the Biafran war (1967–70), military rule and an oil boom, returning to civilian rule in 1999.' },
   { id: 'south-africa', name: 'South Africa', start: 1652, end: 2010, peak: 1994, region: 'Southern Africa',
-    capitals: [['Cape Town', 18.42, -33.92, 1652, 1910], ['Pretoria', 28.19, -25.75, 1910, 2010]], match: ['Cape Colony', 'Union of South Africa', 'South Africa', 'Dutch settlements'],
+    capitals: [['Cape Town', 18.42, -33.92, 1652, 1910], ['Pretoria', 28.19, -25.75, 1910, 2010]], match: ['Cape Colony', 'Union of South Africa', 'South Africa', 'Dutch settlements', 'Natal', 'Zululand', 'Griqualand West'],
     summary: 'A Dutch station at the Cape from 1652, British from 1806. Diamonds, gold and the Boer War (1899–1902) led to the Union of 1910; the apartheid regime from 1948 enforced racial segregation until Nelson Mandela’s election in 1994.' },
 ];
 

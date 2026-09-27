@@ -45,7 +45,7 @@ export const notes: CivInput[] = [
     capitals: [['Pingcheng (Datong)', 113.3, 40.08, 420, 494], ['Luoyang', 112.45, 34.62, 494, 534], ['Jiankang (Nanjing)', 118.78, 32.06, 420, 589]],
     match: ['Toba Wei', 'Southern Qi'],
     summary: 'China divided: the Xianbei Northern Wei and its successors in the north, which carved the Buddhist caves of Yungang and Longmen, and a series of southern courts at Jiankang. The Sui reunited the country in 589.' },
-  { id: 'nanzhao', name: 'Nanzhao & Dali', start: 650, end: 1253, peak: 850, region: 'China', areas: ['China', 'Southeast Asia'],
+  { id: 'nanzhao', name: 'Nanzhao & Dali', start: 600, end: 1253, peak: 850, region: 'China', areas: ['China', 'Southeast Asia'],
     capitals: [['Dali', 100.16, 25.6]], match: ['Nan-Zhao', 'Nan Chao', 'Tai chiefdoms', 'Thai Kingdoms'],
     summary: 'Kingdoms of Yunnan, between China, Tibet and South-East Asia. Nanzhao defeated Tang armies and raided Pyu Burma; its successor Dali was conquered by the Mongols in 1253.' },
   { id: 'liao', name: 'Liao dynasty', start: 916, end: 1125, peak: 1004, region: 'China', areas: ['China', 'Steppe & Central Asia'],

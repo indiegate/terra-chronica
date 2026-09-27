@@ -20,7 +20,7 @@ export const notes: CivInput[] = [
     capitals: [['Tunis', 10.17, 36.8]], match: ['Hafsid Caliphate'],
     summary: 'Almohad governors who made Tunis the capital of an independent state; the historian Ibn Khaldun was born there in 1332. The Ottomans took Tunis in 1574.' },
   { id: 'libya', name: 'Libya', start: 1711, end: 2010, peak: 1970, region: 'North Africa',
-    capitals: [['Tripoli', 13.19, 32.89]], match: ['Tripolitania', 'Libya', 'Libya (IT)', 'Cyraneica (UK Lybia)', 'Tripolitana (UK Lybia)', 'Fezzan (Frech Lybia)'],
+    capitals: [['Tripoli', 13.19, 32.89]], match: ['Tripolitania', 'Libya', 'Libya (IT)', 'Cyraneica (UK Lybia)', 'Tripolitana (UK Lybia)', 'Fezzan (Frech Lybia)', 'Cyrenaica'],
     summary: 'The Karamanli pashas ruled Tripoli almost independently of the Ottomans from 1711. Italy invaded in 1911 and fought a long war against the Senussi; independent as a kingdom in 1951, Libya was ruled by Muammar Gaddafi from 1969.' },
 
   // ── West and Central Africa ────────────────────────────────────────────
@@ -28,10 +28,10 @@ export const notes: CivInput[] = [
     capitals: [], place: [-2.0, 12.0], match: ['West African cereal farmers', 'Mandes'],
     summary: 'Farmers of the savanna and Sahel who domesticated pearl millet, African rice and sorghum. Out of them grew the Nok culture of terracotta sculpture (from about 1500 BC), the city of Jenne-jeno (from about 250 BC) and the Mande-speaking kingdoms of Ghana and Mali.' },
   { id: 'kanem-bornu', name: 'Kanem–Bornu', start: 700, end: 1900, peak: 1580, region: 'West Africa',
-    capitals: [['Njimi', 17.0, 14.5, 700, 1380], ['Ngazargamu', 12.25, 13.0, 1470, 1808]], match: ['Kanem-Bornu', 'Kanem', 'Bornu'],
+    capitals: [['Njimi', 17.0, 14.5, 700, 1380], ['Ngazargamu', 12.25, 13.0, 1470, 1808]], match: ['Kanem-Bornu', 'Kanem', 'Bornu', 'Sultanate of Damagaram'],
     summary: 'A Saharan empire around Lake Chad that controlled trade routes north to Libya for more than a thousand years. Its Sayfawa kings converted to Islam in the 11th century; under Idris Alooma (about 1570–1600) it bought Ottoman muskets.' },
   { id: 'timbuktu', name: 'Pashalik of Timbuktu', start: 1591, end: 1833, peak: 1620, region: 'West Africa',
-    capitals: [['Timbuktu', -3.0, 16.77]], match: ['Pashalik of Timbuktu'],
+    capitals: [['Timbuktu', -3.0, 16.77]], match: ['Pashalik of Timbuktu', 'Arma'],
     summary: 'Moroccan musketeers destroyed Songhai at Tondibi in 1591; their descendants, the Arma, ruled Timbuktu and the Niger bend under their own pashas.' },
   { id: 'sokoto', name: 'Sokoto Caliphate', start: 1804, end: 1903, peak: 1850, region: 'West Africa',
     capitals: [['Sokoto', 5.24, 13.06]], match: ['Sokoto Caliphate', 'Fulani Empire'],
@@ -52,7 +52,7 @@ export const notes: CivInput[] = [
 
   // ── Southern Africa and Madagascar ─────────────────────────────────────
   { id: 'angola', name: 'Angola', start: 1575, end: 2010, peak: 1975, region: 'Central Africa',
-    capitals: [['Luanda', 13.23, -8.84]], match: ['Angola', 'Angola (Portugal)'],
+    capitals: [['Luanda', 13.23, -8.84]], match: ['Angola', 'Angola (Portugal)', 'Mbailundu', 'Ovimbundu'],
     summary: 'Portugal founded Luanda in 1575, and for three centuries Angola was the largest source of enslaved Africans shipped to Brazil. Independence in 1975 was followed by a civil war that lasted until 2002.' },
   { id: 'mozambique', name: 'Mozambique', start: 1505, end: 2010, peak: 1975, region: 'Southern Africa',
     capitals: [['Lourenço Marques (Maputo)', 32.57, -25.97, 1898, 2010]], place: [40.74, -15.03], match: ['Mozambique', 'Mozambique (Portugal)'],
@@ -72,10 +72,10 @@ export const notes: CivInput[] = [
 
   // ── Arabia ─────────────────────────────────────────────────────────────
   { id: 'arabia', name: 'Peoples of Arabia', start: -4000, end: 1938, peak: -1000, region: 'Near East',
-    capitals: [], place: [45.0, 24.0], match: ['Semites', 'Arabian pastoral nomads', 'Arabs', 'Bedouins', "Emirate of Bin Shal'an"],
+    capitals: [], place: [45.0, 24.0], match: ['Semites', 'Arabian pastoral nomads', 'Arabs', 'Bedouins', "Emirate of Bin Shal'an", 'Hail'],
     summary: 'Herders and oasis farmers of the Arabian peninsula. The domestication of the camel, by about 1000 BC, opened the desert to caravans; Arab tribes, recorded from the 9th century BC, carried Islam out of Arabia in the 7th century AD, while Bedouin confederations ruled the steppe into the 20th.' },
   { id: 'oman-gulf', name: 'Oman & the Gulf', start: -2500, end: 2010, peak: 1850, region: 'Near East',
-    capitals: [['Muscat', 58.59, 23.61]], match: ['Oman', 'Oman and the Aden Protectorate', 'Trucial States', 'Qatar', 'Kuwait', 'United Arab Emirates', 'Mascat', 'Muscat', 'Gharra', 'Muscat and Oman', 'Oman (British Raj)'],
+    capitals: [['Muscat', 58.59, 23.61]], match: ['Oman', 'Oman and the Aden Protectorate', 'Trucial States', 'Qatar', 'Kuwait', 'United Arab Emirates', 'Mascat', 'Muscat', 'Gharra', 'Muscat and Oman', 'Oman (British Raj)', 'Mazun', 'Trucial Oman'],
     summary: 'Ancient Magan exported copper to Sumer; Ibadi imams ruled inland Oman from the 8th century, and Muscat and Sohar traded across the Indian Ocean. The Ya‘rubi imams expelled the Portuguese from Muscat in 1650 and built a maritime empire reaching Zanzibar. The Gulf sheikhdoms signed truces with Britain from 1820; oil transformed them after 1930, and they became independent between 1961 and 1971.' },
   { id: 'ayyubids', name: 'Ayyubid Sultanate', start: 1171, end: 1260, peak: 1190, region: 'Near East', areas: ['Near East', 'North Africa'],
     capitals: [['Cairo', 31.24, 30.04]], match: ['Ayyubid Sultanate'],

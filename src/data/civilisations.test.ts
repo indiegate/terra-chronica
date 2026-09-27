@@ -1,6 +1,6 @@
 import { readFileSync } from 'node:fs';
 import { describe, expect, it } from 'vitest';
-import { CIVILISATIONS, EVENTS } from './civilisations';
+import { CIVILISATIONS, EVENTS, civFor } from './civilisations';
 
 const names: Record<string, number[]> = JSON.parse(readFileSync('public/data/names.json', 'utf8'));
 
@@ -27,6 +27,11 @@ describe('civilisation notes', () => {
   it('match at least one snapshot within their own dates (or none at all)', () => {
     const idle = CIVILISATIONS.filter((c) => c.match.length && !c.match.some((n) => names[n.trim()].some((y) => y >= c.start && y <= c.end)));
     expect(idle.map((c) => c.id)).toEqual([]);
+  });
+
+  it('links names regardless of stray spaces', () => {
+    expect(civFor('Zacateco ', 1492)?.id).toBe(civFor('Zacateco', 1492)?.id);
+    expect(civFor('Zacateco ', 1492)).toBeDefined();
   });
 
   it('events fall inside human history', () => {

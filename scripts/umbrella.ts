@@ -19,8 +19,8 @@ const base = CIVILISATIONS.map((c) => {
   return { ...c, match: c.match.filter((n) => !extra.has(n)) };
 });
 const byName = new Map<string, typeof base>();
-for (const c of base) for (const n of c.match) byName.set(n, [...(byName.get(n) ?? []), c]);
-const linked = (name: string, year: number) => (byName.get(name) ?? []).some((c) => year >= c.start && year <= c.end);
+for (const c of base) for (const n of c.match) byName.set(n.trim(), [...(byName.get(n.trim()) ?? []), c]);
+const linked = (name: string, year: number) => (byName.get(name.trim()) ?? []).some((c) => year >= c.start && year <= c.end);
 
 const umbrellas = base.filter((c) => c.covers);
 const out: Record<string, Set<string>> = {};

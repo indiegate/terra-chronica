@@ -9,6 +9,7 @@
 
 export const CORRECTIONS = [
   // ── Prehistory (10,000–3000 BC) ───────────────────────────────────────
+  { years: [-2000], from: 'Dakapeng culture', to: 'Dapenkeng culture', why: 'Misspelling' },
   { years: [-5000], from: '      ', to: 'Cardial Ware culture', why: 'The source leaves NAME blank; its ABBREVN is "Cardial Ware culture"' },
   { years: [-10000, -8000], from: 'Okhotsk culture', to: 'Jōmon', why: 'The Okhotsk culture dates to c. AD 500–1200; northern Japan was Jōmon' },
   { years: [-5000, -4000, -3000, -2000, -1500, -1000, -700, -500, -400], from: 'Ainu', to: 'Jōmon', why: 'Ainu culture took shape c. 13th century AD; before 300 BC Hokkaido was Jōmon' },
@@ -56,6 +57,10 @@ export const CORRECTIONS = [
   { years: [-1], from: 'Moche', to: 'Gallinazo culture', why: 'Moche culture begins c. AD 100' },
 
   // ── Late antiquity & medieval ──────────────────────────────────────────
+  { years: [500, 600], from: 'Tuʻi Tonga Empire', to: 'Tongan chiefdoms', why: 'The Tuʻi Tonga dynasty dates from c. AD 950' },
+  { years: [600, 700], from: 'Teotihuacan', to: 'Post-Teotihuacan Basin of Mexico', why: 'Teotihuacan’s centre burned c. 550 and the city lost its power' },
+  { years: [700], from: 'Paekche', to: 'Silla', why: 'Baekje fell to Silla and Tang in 660' },
+  { years: [1400], from: 'Bulgar Khanate', to: 'Ottoman Empire', why: 'The Ottomans conquered the last Bulgarian states in 1393–96' },
   { years: [700], from: 'Koguryo', to: 'Balhae', why: 'Goguryeo fell in 668; Balhae was founded in its northern lands in 698' },
   { years: [800], from: 'Silia', to: 'Silla', why: 'Misspelling' },
   { years: [900], from: 'Yamato', to: 'Japan', why: 'The Yamato period ended with the move to Heian-kyō in 794' },
@@ -105,6 +110,9 @@ export const CORRECTIONS = [
   { years: [1300], from: 'Pagan', to: 'Myinsaing and Pinya', why: 'The Pagan kingdom ended in 1297' },
   { years: [1400], from: 'Pagan', to: 'Ava', why: 'The Pagan kingdom ended in 1297; the Ava kingdom ruled Upper Burma from 1364' },
   // ── Early modern ───────────────────────────────────────────────────────
+  { years: [1700, 1715], from: 'Arakan (Indian princely state)', to: 'Arakan', why: 'Arakan (Mrauk U) was an independent kingdom until Burma conquered it in 1784' },
+  { years: [1783, 1800, 1815], from: 'Sotho', to: 'Niger Delta city-states', why: 'The polygon lies in the Niger Delta (Bonny, Brass, Kalabari); the Sotho live in southern Africa' },
+  { years: [1815], from: '       ', to: 'United Kingdom of the Netherlands', why: 'The source leaves NAME blank; its SUBJECTO is the United Kingdom of the Netherlands' },
   { years: [1492, 1500], from: 'Philippines', to: 'Philippine barangay states', why: 'The Philippines were named and united under Spanish rule from 1565' },
   { years: [1650, 1700, 1715, 1783], from: 'Malaya', to: 'Malay sultanates', why: 'British Malaya dates from 1786 at the earliest' },
   { years: [1600], from: 'Orissa', to: 'Mughal Empire', why: 'The Mughals conquered Orissa in 1592' },
@@ -122,6 +130,17 @@ export const CORRECTIONS = [
   { years: [1700], from: 'Post-Ming Warlords', to: 'Qing Empire', why: 'The Qing crushed the Three Feudatories in 1681' },
   { years: [1715], from: 'Egypt', to: 'Ottoman Egypt', subject: 'Ottoman Empire', why: 'An Ottoman province from 1517' },
   // ── Modern ─────────────────────────────────────────────────────────────
+  { years: [1880], from: 'Ivory Coast', to: 'Akan and Kru states', why: 'France made the Ivory Coast a colony in 1893; in 1880 the region was ruled by Akan kingdoms and Kru communities' },
+  { years: [1900], from: 'Tukular Caliphate', to: 'French West Africa', subject: 'France', why: 'France defeated the Toucouleur Empire in 1890–93' },
+  { years: [1900], from: 'Second Samori Empire', to: 'French West Africa', subject: 'France', why: 'France captured Samori Ture in 1898' },
+  { years: [1914, 1920, 1930, 1938], from: 'Malawi', to: 'Nyasaland', subject: 'United Kingdom', why: 'Nyasaland became independent as Malawi in 1964' },
+  { years: [1930, 1938], from: 'Hail', to: 'Saudi Arabia', why: 'Ibn Saud took Ha’il from the Rashidis in 1921' },
+  { years: [1920, 1930, 1938], from: 'Togo', to: 'French Togoland', subject: 'France', why: 'A French mandate until independence in 1960' },
+  { years: [1920, 1930, 1938], from: 'Guinea-Bissau', to: 'Portuguese Guinea', subject: 'Portugal', why: 'A Portuguese colony until 1974' },
+  { years: [1914, 1920, 1930, 1938], from: 'Equatorial Guinea', to: 'Spanish Guinea', subject: 'Spain', why: 'A Spanish colony until 1968' },
+  { years: [1914, 1920, 1930, 1938], from: 'Lesotho', to: 'Basutoland', subject: 'United Kingdom', why: 'Basutoland became independent as Lesotho in 1966' },
+  { years: [1914], from: 'Djibouti', to: 'French Somaliland', subject: 'France', why: 'French Somaliland until 1967; independent as Djibouti in 1977' },
+  { years: [1960], from: 'Djibouti', to: 'French Somaliland', subject: 'France', why: 'French Somaliland until 1967; independent as Djibouti in 1977' },
   { years: [1900], from: 'Benin', to: 'Southern Nigeria', subject: 'United Kingdom', why: 'Britain conquered the Kingdom of Benin in 1897' },
   { years: [1960], from: 'Benin', to: 'Dahomey', why: 'Independent as Dahomey in 1960; renamed Benin in 1975' },
   { years: [1960], from: 'Burkina Faso', to: 'Upper Volta', why: 'Independent as Upper Volta in 1960; renamed Burkina Faso in 1984' },

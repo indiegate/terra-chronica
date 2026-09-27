@@ -41,8 +41,8 @@ export const notes: CivInput[] = [
   { id: 'susiana', name: 'Susiana culture', start: -6000, end: -3200, peak: -4200, region: 'Iran',
     capitals: [], place: [48.25, 32.19], match: ['Susiana culture'],
     summary: 'Farming villages of the Susiana plain in south-western Iran, related to the Ubaid culture of Mesopotamia. Susa was founded about 4200 BC around a great platform temple; the region became the heartland of Elam.' },
-  { id: 'ghassulian', name: 'Ghassulian culture', start: -4500, end: -3500, peak: -4000, region: 'Near East',
-    capitals: [], place: [35.6, 31.8], match: [],
+  { id: 'ghassulian', name: 'Ghassulian culture', start: -5500, end: -3500, peak: -4000, region: 'Near East',
+    capitals: [], place: [35.6, 31.8], match: ['Wadi Rabah culture'],
     summary: 'Copper Age villages of the southern Levant, famous for wall paintings and the Nahal Mishmar hoard of cast copper sceptres and crowns.' },
 
   // ── Europe ─────────────────────────────────────────────────────────────
@@ -103,8 +103,8 @@ export const notes: CivInput[] = [
   { id: 'early-south-america', name: 'Early South Americans', start: -10000, end: -1500, peak: -6000, region: 'South America',
     capitals: [], place: [-72, -13.5], match: ['Andean coastal foragers', 'Archaic Amerindian hunter-gatherers'],
     summary: 'Descendants of the first Americans spread from the Amazon to Tierra del Fuego. In the Andes they domesticated potatoes, quinoa, llamas, alpacas and guinea pigs; on the Pacific coast they fished, and they began shaping the Amazon forest with useful trees.' },
-  { id: 'amazonia', name: 'Peoples of Amazonia', start: -1500, end: 1800, peak: 1000, region: 'South America',
-    capitals: [], place: [-60, -5], covers: { box: [-80, -24, -34, 12] }, match: ['Amazon hunter-gatherers', 'Manioc farmers', 'Tupis', 'Tekohá (Guarani)', 'Mbya'],
+  { id: 'amazonia', name: 'Peoples of Amazonia', start: -1500, end: 1850, peak: 1000, region: 'South America',
+    capitals: [], place: [-60, -5], covers: { box: [-80, -24, -34, 12] }, match: ['Amazon hunter-gatherers', 'Manioc farmers', 'Tupis', 'Tekohá (Guarani)', 'Mbya', 'Shuar'],
     summary: 'Manioc farmers and forest foragers of the Amazon basin. Some built large settlements with raised fields, earthworks and fertile “dark earth” (terra preta); Tupi-speakers spread along the Atlantic coast. European diseases after 1500 caused a catastrophic collapse.' },
 ];
 

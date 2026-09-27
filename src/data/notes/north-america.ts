@@ -73,11 +73,11 @@ export const notes: CivInput[] = [
     capitals: [], place: [-45.5, 61.15], match: [],
     summary: 'Erik the Red led settlers from Iceland to south-west Greenland in 985, and from there Norse sailors reached Newfoundland around 1000. The Greenland farms, with a bishop at Garðar, lasted about 450 years before being abandoned in the 1400s as the climate cooled and trade dwindled.' },
   { id: 'sami', name: 'Sámi', start: -1500, end: 2010, peak: 1500, region: 'Arctic', areas: ['Arctic', 'Europe'],
-    capitals: [], place: [23.3, 68.5], match: ['Saami', 'Sámi', 'Sami', 'Samis'],
+    capitals: [], place: [23.3, 68.5], match: ['Saami', 'Sámi', 'Sami', 'Samis', 'Finnmark'],
     summary: 'Reindeer herders, fishers and hunters of northern Fennoscandia and the Kola Peninsula, speaking Uralic languages. Taxed and gradually settled on by Norway, Sweden, Finland and Russia, they are today recognised as an indigenous people in all four.' },
   { id: 'siberian-peoples', name: 'Peoples of Siberia', start: -2000, end: 1700, peak: 1500, region: 'Arctic', areas: ['Arctic', 'Steppe & Central Asia'],
     capitals: [], place: [129.7, 62.0],
-    match: ['Paleo-Siberian hunter-gatherers', 'Finno-Ugric taiga hunter-gatherers', 'Siberians', 'Samoyèdes', 'Permians', 'Chukchi', 'Nenets', 'Khanty', 'Nganasan', 'Kurykans', 'Koryaks', 'Itelmen', 'Komi', 'Enets'],
+    match: ['Paleo-Siberian hunter-gatherers', 'Finno-Ugric taiga hunter-gatherers', 'Siberians', 'Samoyèdes', 'Permians', 'Chukchi', 'Nenets', 'Khanty', 'Nganasan', 'Kurykans', 'Koryaks', 'Itelmen', 'Komi', 'Enets', 'Yukagir'],
     summary: 'Reindeer herders, hunters and fishers of the taiga and tundra: Uralic peoples such as the Khanty and Nenets in the west, Evenks, Yakuts and Chukchi further east. Russian fur traders and Cossacks conquered Siberia between the 1580s and 1640s, reaching the Pacific in 1639.' },
 ];
 

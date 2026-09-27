@@ -15,11 +15,12 @@ import * as modern from './modern';
 import * as neolithic from './neolithic';
 import * as northAmerica from './north-america';
 import * as oceania from './oceania';
+import * as regional from './regional';
 import * as southAsia from './south-asia';
 import * as southeastAsia from './southeast-asia';
 import * as steppe from './steppe';
 
-const FILES = [neolithic, koreaJapan, oceania, northAmerica, southeastAsia, eastAfrica, southAsia, iranChina, modern, europe, steppe, africa, europeMore, asiaMore, africaMore];
+const FILES = [neolithic, koreaJapan, oceania, northAmerica, southeastAsia, eastAfrica, southAsia, iranChina, modern, europe, steppe, africa, europeMore, asiaMore, africaMore, regional];
 
 export const NOTES: CivInput[] = FILES.flatMap((f) => f.notes);
 export const NOTE_EVENTS: HistoricEvent[] = FILES.flatMap((f) => f.events);
