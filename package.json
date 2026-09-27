@@ -11,7 +11,8 @@
     "build": "tsc && vite build",
     "preview": "vite preview",
     "coverage": "vite-node scripts/coverage.ts",
-    "test": "vitest run"
+    "test": "vitest run",
+    "names": "vite-node scripts/names.ts --"
   },
   "dependencies": {
     "d3": "^7.9.0",

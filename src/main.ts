@@ -349,7 +349,7 @@ function wikiLink(title: string) {
 /** Capitals in order, the one in use at the current year highlighted. */
 function seatList(civ: Civilisation) {
   const now = capitalAt(civ, year);
-  if (civ.capitals.length === 1) return esc(civ.capitals[0].name);
+  if (civ.capitals.length <= 1) return esc(civ.capitals[0]?.name ?? '');
   return civ.capitals
     .map((k) => {
       const label = `${esc(k.name)} <span class="muted">${formatSpan(k.from, k.to)}</span>`;
@@ -371,7 +371,7 @@ function renderInfo(hit: TerritoryHit | null) {
   if (civ) {
     rows.push(`<dt>Flourished</dt><dd>${formatSpan(civ.start, civ.end)}</dd>`);
     rows.push(`<dt>Zenith</dt><dd>c. ${formatYear(civ.peak)}</dd>`);
-    rows.push(`<dt>${civ.capitals.length > 1 ? 'Capitals' : 'Seat'}</dt><dd>${seatList(civ)}</dd>`);
+    if (civ.capitals.length) rows.push(`<dt>${civ.capitals.length > 1 ? 'Capitals' : 'Seat'}</dt><dd>${seatList(civ)}</dd>`);
     rows.push(`<dt>Region</dt><dd>${esc(civ.region)}</dd>`);
   }
   if (civ && civ.name !== hit.name) rows.push(`<dt>Shown as</dt><dd>${esc(hit.name)}</dd>`);
@@ -584,9 +584,11 @@ async function goToCiv(c: Civilisation) {
   const snap = snapshotWith(c.match, c.peak);
   const y = snap !== undefined && snap >= c.start - 200 && snap <= c.end + 100 ? snap : c.peak;
   await setYear(y);
-  const focused = await map.focus(c.match, y);
+  // Only a surveyed year has borders to fit the view to.
+  const focused = snapshots.includes(y) && c.match.length > 0 && (await map.focus(c.match, y));
   const cap = capitalAt(c, y) ?? c.capitals[0];
-  if (!focused) map.focusPoint(cap.lon, cap.lat, 4);
+  const at = cap ? [cap.lon, cap.lat] : c.place;
+  if (!focused && at) map.focusPoint(at[0], at[1], 4);
   const name = c.match.find((n) => nameIndex[n]?.includes(y));
   if (name) map.select(name, y);
   else renderInfo({ name: c.name, subjectOf: null, partOf: null, precision: null, snapshot: y, civ: c });

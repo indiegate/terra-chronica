@@ -4,6 +4,7 @@
 // snapshot year falls within the civilisation's own start–end dates.
 
 import { areasFor, type Area } from './regions';
+import { NOTES, NOTE_EVENTS } from './notes';
 
 export interface Capital {
   name: string;
@@ -26,10 +27,13 @@ export interface Civilisation {
   areas: Area[];
   match: string[];
   summary: string;
+  /** Where to fly to for cultures without a capital (a key site), [lon, lat]. */
+  place?: [number, number];
 }
 
-type CapitalInput = [name: string, lon: number, lat: number, from?: number, to?: number];
-type CivInput = Omit<Civilisation, 'capitals' | 'areas'> & { capitals: CapitalInput[]; areas?: Area[] };
+export type CapitalInput = [name: string, lon: number, lat: number, from?: number, to?: number];
+/** As written in the data files: capitals as tuples, areas usually derived from the region. */
+export type CivInput = Omit<Civilisation, 'capitals' | 'areas'> & { capitals: CapitalInput[]; areas?: Area[] };
 
 const DATA: CivInput[] = [
   // ── Cradles of civilisation ──────────────────────────────────────────
@@ -292,7 +296,7 @@ const DATA: CivInput[] = [
     summary: 'A one-party socialist federation that spanned eleven time zones and rivalled the United States in the Cold War.' },
 ];
 
-export const CIVILISATIONS: Civilisation[] = DATA.map((c) => ({
+export const CIVILISATIONS: Civilisation[] = [...DATA, ...NOTES].map((c) => ({
   ...c,
   areas: areasFor(c.id, c.region, c.areas),
   capitals: c.capitals.map(([name, lon, lat, from = c.start, to = c.end]) => ({ name, lon, lat, from, to })),
@@ -363,4 +367,5 @@ export const EVENTS: HistoricEvent[] = [
   { year: 1914, label: 'First World War begins', area: 'World' },
   { year: 1945, label: 'End of the Second World War', area: 'World' },
   { year: 1991, label: 'Dissolution of the Soviet Union', area: 'Europe' },
+  ...NOTE_EVENTS,
 ];
