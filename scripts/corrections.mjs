@@ -28,6 +28,11 @@ export const CORRECTIONS = [
   { years: [-4000, -3000], from: 'Kerma', to: 'Nubian A-Group', why: 'The Kerma culture begins c. 2500 BC; before it Lower Nubia had the A-Group' },
 
   // ── Ancient ────────────────────────────────────────────────────────────
+  { years: [-2000], from: 'Thai', to: 'Longshan and southern Neolithic cultures', why: 'The polygon covers most of China; Tai peoples were one small part of its south' },
+  { years: [-200], from: 'Thai', to: 'Dian, Yelang and south-western peoples', why: 'The polygon covers Yunnan, Guizhou and upper Burma, home to the Dian and Yelang kingdoms' },
+  { years: [-400], from: 'Proto-Thai cultures', to: 'Northern Chinese states and pastoralists', why: 'The polygon covers North China and Manchuria, far from any Tai-speaking peoples' },
+  { years: [-200, -100], from: 'minor states', to: 'Anatolian and Armenian kingdoms', why: 'The polygon covers Anatolia and Armenia: Pontus, Cappadocia, Bithynia and Armenia' },
+  { years: [-10000, -8000, -4000, -3000, -2000], from: 'Hunters-gatherers', to: 'Island hunter-gatherers', why: 'Spelling; the polygon covers Sardinia, Corsica and Madagascar' },
   { years: [-4000], from: 'Egypt', to: 'Naqada culture', why: 'Egypt was unified c. 3100 BC; 4000 BC is the predynastic Naqada period' },
   { years: [-4000], from: 'Minoan', to: 'Neolithic Crete', why: 'Minoan civilisation begins c. 3100 BC' },
   { years: [-1500], from: 'Greek city-states', to: 'Mycenaean Greece', why: 'City-states (poleis) emerge after c. 800 BC' },
@@ -41,6 +46,12 @@ export const CORRECTIONS = [
   { years: [-1], from: 'Moche', to: 'Gallinazo culture', why: 'Moche culture begins c. AD 100' },
 
   // ── Late antiquity & medieval ──────────────────────────────────────────
+  { years: [300, 400], from: 'Satavahanihara', to: 'Vakataka and Ikshvaku kingdoms', why: 'The Satavahana dynasty ended c. 225' },
+  { years: [400], from: 'Meroe', to: 'Post-Meroitic Nubia', why: 'The kingdom of Meroe collapsed c. 350' },
+  { years: [800], from: 'Rajput Clans and Small States', to: 'Mon, Pyu and Tai states', why: 'The polygon covers mainland South-East Asia, not Rajasthan' },
+  { years: [900], from: 'Azandes', to: 'Ubangian and Nilotic peoples', why: 'The Azande state formed in the 18th century; the polygon covers the southern Sudan and Ubangi' },
+  { years: [1000], from: 'Peshemegs', to: 'Pechenegs', why: 'Misspelling' },
+  { years: [1200], from: 'Ifat', to: 'Sultanate of Shewa', why: 'The Ifat sultanate replaced Shewa c. 1285' },
   { years: [1100, 1200], from: 'Tiahuanaco Empire', to: 'Aymara kingdoms', why: 'Tiwanaku collapsed c. AD 1000–1100; the Aymara kingdoms followed' },
   { years: [1100, 1200], from: 'Huari Empire', to: 'Andean states and chiefdoms', why: 'The Wari state collapsed c. AD 1000' },
   { years: [300], from: 'Parthian Empire', to: 'Sasanian Empire', why: 'The Sasanians overthrew the Parthians in AD 224' },
@@ -62,6 +73,15 @@ export const CORRECTIONS = [
     years: [1400], from: n, to: n, subject: null, why: 'No unified Mongol Empire existed in 1400',
   })),
 
+  { years: [1200], from: 'Liao', to: 'Jin dynasty (Jurchen)', why: 'The Liao fell to the Jurchen Jin in 1125' },
+  { years: [1200], from: 'Fatimid Caliphate', to: 'Ayyubid Sultanate', why: 'Saladin ended the Fatimid Caliphate in 1171' },
+  { years: [1200], from: 'Sultanate of Delhi', to: 'Ghurid Empire', why: 'The Delhi Sultanate was founded in 1206; in 1200 northern India was held by the Ghurids' },
+  { years: [1200], from: 'Buwayhid Emirates', to: 'Khwarazmian Empire', why: 'The Buyids fell in 1062; the Khwarazmshahs took central Iran in 1194' },
+  { years: [1200], from: 'Khwarazmian dynasty', to: 'Khwarazmian Empire', why: 'Same state as the polygon renamed above' },
+  { years: [900], from: 'Tibetan Empire', to: 'Tibet', why: 'The Tibetan Empire collapsed in 842' },
+  { years: [1100], from: 'Kingdom of Sukhotai', to: 'Tai chiefdoms', why: 'Sukhothai was founded c. 1238' },
+  { years: [1300], from: 'Pagan', to: 'Myinsaing and Pinya', why: 'The Pagan kingdom ended in 1297' },
+  { years: [1400], from: 'Pagan', to: 'Ava', why: 'The Pagan kingdom ended in 1297; the Ava kingdom ruled Upper Burma from 1364' },
   // ── Early modern ───────────────────────────────────────────────────────
   { years: [1600], from: 'Inca Empire', to: 'Viceroyalty of Peru', subject: 'Spain', why: 'The Inca Empire fell in 1533 (last Neo-Inca stronghold 1572)' },
   { years: [1600], from: 'Songhai', to: 'Pashalik of Timbuktu', subject: 'Morocco', why: 'The Songhai Empire fell to Morocco in 1591; the polygon covers the Niger bend around Gao and Timbuktu' },
@@ -70,7 +90,10 @@ export const CORRECTIONS = [
   { years: [1783, 1800, 1815], from: 'Zulu', to: 'Northern Nguni chiefdoms', why: 'The Zulu Kingdom was founded by Shaka in 1816' },
   { years: [1650, 1700, 1715, 1815, 1880, 1900], from: 'Manchu Empire', to: 'Qing Empire', why: 'Same state is called "Qing Empire" in other snapshots' },
 
+  { years: [1700], from: 'Post-Ming Warlords', to: 'Qing Empire', why: 'The Qing crushed the Three Feudatories in 1681' },
+  { years: [1715], from: 'Egypt', to: 'Ottoman Egypt', subject: 'Ottoman Empire', why: 'An Ottoman province from 1517' },
   // ── Modern ─────────────────────────────────────────────────────────────
+  { years: [1914], from: 'British Protectorate', to: 'Oman and the Aden Protectorate', why: 'The polygon covers Oman and southern Arabia under British protection' },
   { years: [-1500], from: 'Zhoa', to: 'Shang', why: 'Misspelling of Zhou; c. 1500 BC the Yellow River plain was ruled by the Shang (the Zhou conquest was c. 1046 BC)' },
   { years: [-1000, -700], from: 'Zhoa', to: 'Zhou', why: 'Misspelling of Zhou' },
   { years: [1938], from: 'Israel', to: 'Mandatory Palestine (GB)', why: 'Israel was founded in 1948; in 1938 this was the British Mandate' },
@@ -130,6 +153,8 @@ export const CORRECTIONS = [
   { years: [1945], from: 'Zaire', to: 'Belgian Congo', subject: 'Belgium', why: 'Independent in 1960; renamed Zaire only in 1971' },
   { years: [1960], from: 'Zaire', to: 'Republic of the Congo (Léopoldville)', why: 'Renamed Zaire in 1971' },
   { years: [1920], from: 'USSR', to: 'Russian SFSR', why: 'The USSR was founded in December 1922' },
+  { years: [1960], from: 'Tibet', to: 'Tibet (China)', subject: 'China', why: 'Annexed by the People’s Republic of China in 1950' },
+  { years: [1920], from: 'Iran', to: 'Persia', why: 'The Qajar dynasty ruled until 1925; the country was renamed Iran in 1935' },
   ...['Georgia', 'Armenia', 'Azerbaijan'].map((n) => ({
     years: [1920], from: n, to: n, subject: null, why: 'Independent in early 1920; joined the USSR at its founding in 1922',
   })),
