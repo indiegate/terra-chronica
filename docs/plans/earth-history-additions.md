@@ -123,7 +123,7 @@ The borders cover the whole span, but the hand-written content does not. `src/da
 > **Batch 2 (2026-09-27): Southeast Asia, East Africa, South Asia, Iran, China, colonial Latin America, modern states and early-Holocene foragers.**
 > - Every area × period cell now has a note (0 of 527 empty). Large unlinked polygons are down to 171.
 > - Events remain sparse: 348 of 425 cells empty. That is the next batch, alongside the remaining unlinked polygons.
-> - About 120 more source errors were corrected in `scripts/corrections.mjs`:
+> - 71 more correction rules in `scripts/corrections.mjs`, 111 polygon-years in all (together with batch 1's):
 >   - the 1945 snapshot drew about 40 colonies and mandates as later independent states (Bangladesh, Benin, Namibia, Israel, Pakistan, the UAE and others)
 >   - "Zhoa" for Zhou; Malaysia before 1963; Brazil's empire and republic
 >   - Paraguay before 1811; Tiwanaku and Wari after their collapse
