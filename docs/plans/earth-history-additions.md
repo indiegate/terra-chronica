@@ -114,7 +114,7 @@ The borders cover the whole span, but the hand-written content does not. `src/da
 ### 1.2 Content to add
 
 > **Progress (2026-09-27), batch 1: Korea & Japan, Oceania, North America, the Arctic and the Neolithic.**
-> - Added 64 notes and 48 events in `src/data/notes/`, with one file per region.
+> - Added 68 notes and 48 events in `src/data/notes/`, with one file per region.
 > - Coverage now: 75 of 527 cells empty (down from 300); events 374 of 425 (down from 406); large unlinked polygons 270 (down from 347).
 > - Notes may now have a `place` instead of capitals, for cultures such as Çatalhöyük and Cahokia that have no polygon or seat of power. `npm run names` finds polygon names for `match`.
 > - A test checks every `match` name against the snapshots, and that each note links at least one snapshot within its dates. It has already caught source polygons dated before their culture existed (Ghassul and Funnel-Beaker in 5000 BC), and a `Kelteminar` polygon drawn on New Zealand in 5000 BC: a candidate for `corrections.mjs`.
