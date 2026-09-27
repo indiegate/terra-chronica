@@ -119,6 +119,14 @@ The borders cover the whole span, but the hand-written content does not. `src/da
 > - Notes may now have a `place` instead of capitals, for cultures such as Çatalhöyük and Cahokia that have no polygon or seat of power. `npm run names` finds polygon names for `match`.
 > - A test checks every `match` name against the snapshots, and that each note links at least one snapshot within its dates. It has already caught source polygons dated before their culture existed (Ghassul and Funnel-Beaker in 5000 BC), and a `Kelteminar` polygon drawn on New Zealand in 5000 BC: a candidate for `corrections.mjs`.
 > - Still empty: Southeast Asia (AD 1–600 and 1500 onwards), East Africa (before 3000 BC and after 1600), Iran (19th–21st centuries), South Asia (AD 1–300 and 600–800), China (AD 300–500) and Europe before 7000 BC. These are the next batch.
+>
+> **Batch 2 (2026-09-27): Southeast Asia, East Africa, South Asia, Iran, China, colonial Latin America, modern states and early-Holocene foragers.**
+> - Every area × period cell now has a note (0 of 527 empty). Large unlinked polygons are down to 171.
+> - Events remain sparse: 348 of 425 cells empty. That is the next batch, alongside the remaining unlinked polygons.
+> - About 120 more source errors were corrected in `scripts/corrections.mjs`:
+>   - the 1945 snapshot drew about 40 colonies and mandates as later independent states (Bangladesh, Benin, Namibia, Israel, Pakistan, the UAE and others)
+>   - "Zhoa" for Zhou; Malaysia before 1963; Brazil's empire and republic
+>   - Paraguay before 1811; Tiwanaku and Wari after their collapse
 
 Each entry follows the existing format: dates, capitals over time, `match` names from the border polygons, and a 2–3 sentence summary.
 

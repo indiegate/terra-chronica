@@ -1,8 +1,29 @@
-// The first farmers and their neighbours, 10,000–3000 BC, and the long-lived
-// foraging and herding peoples that the border snapshots show alongside them.
+// The first farmers and their neighbours, 10,000–3000 BC, the foragers of the
+// early Holocene, and the long-lived foraging and herding peoples that the
+// border snapshots show alongside them.
 import type { CivInput, HistoricEvent } from '../civilisations';
 
 export const notes: CivInput[] = [
+  // ── Early Holocene foragers ────────────────────────────────────────────
+  { id: 'mesolithic-europe', name: 'Mesolithic Europe', start: -9700, end: -4000, peak: -7000, region: 'Europe',
+    capitals: [], place: [-0.4, 54.21], match: [],
+    summary: 'As the ice retreated, hunter-gatherers spread into the new forests of Europe, hunting red deer and fishing with bows, microliths and dugout canoes. At Star Carr in Yorkshire (about 9000 BC) they built the oldest known house in Britain and wore antler headdresses.' },
+  { id: 'capsian', name: 'Iberomaurusian & Capsian North Africa', start: -10000, end: -5000, peak: -7000, region: 'North Africa',
+    capitals: [], place: [8.0, 35.4], match: [],
+    summary: 'Foragers of the Maghreb who gathered land snails in great shell middens, made fine microliths and decorated ostrich eggshells, before herding reached them from the east.' },
+  { id: 'steppe-foragers', name: 'Foragers of the Eurasian steppe', start: -10000, end: -4500, peak: -7000, region: 'Steppe',
+    capitals: [], place: [55.0, 50.0], match: [],
+    summary: 'Hunter-gatherers and fishers of the steppes, rivers and forest edges from the Dnieper to the Altai, who made some of the earliest pottery in western Eurasia (about 7000 BC, on the Volga) long before farming or herding arrived.' },
+  { id: 'mesolithic-south-asia', name: 'Mesolithic South Asia', start: -10000, end: -4000, peak: -7000, region: 'South Asia',
+    capitals: [], place: [77.61, 22.94], match: [],
+    summary: 'Hunter-gatherers with microlithic tools across the subcontinent, who painted the rock shelters of Bhimbetka and buried their dead at sites in the Ganges plain such as Sarai Nahar Rai.' },
+  { id: 'paleo-indians', name: 'Paleo-Indians', start: -10000, end: -8000, peak: -9000, region: 'North America', areas: ['North America', 'Mesoamerica'],
+    capitals: [], place: [-103.33, 34.28], match: [],
+    summary: 'The first peoples of the Americas after the Ice Age. Clovis and then Folsom hunters, with their fluted spear points, hunted mammoth, mastodon and giant bison, which died out around this time; others foraged the forests, deserts and coasts from Alaska to the Isthmus.' },
+  { id: 'early-arctic', name: 'First Arctic foragers', start: -9500, end: -4000, peak: -7000, region: 'Arctic', areas: ['Arctic', 'Europe'],
+    capitals: [], place: [152.7, 76.1], match: [],
+    summary: 'As the Ice Age ended, foragers followed the retreating ice into the far north: the Komsa culture on the Arctic coast of Norway from about 9500 BC, and on Zhokhov Island, far off Siberia, polar-bear and reindeer hunters with sled dogs by about 7000 BC.' },
+
   // ── Near East ──────────────────────────────────────────────────────────
   { id: 'levant-neolithic', name: 'First farmers of the Fertile Crescent', start: -10000, end: -6500, peak: -8000, region: 'Near East',
     capitals: [], place: [35.44, 31.87], match: ['Levantine Corridor (Neolithic Farmers)', 'Neolithic Farmers'],
@@ -62,9 +83,9 @@ export const notes: CivInput[] = [
   { id: 'sundaland-foragers', name: 'Island Southeast Asian foragers', start: -10000, end: -2000, peak: -6000, region: 'Southeast Asia',
     capitals: [], place: [113.78, 3.82], match: ['Island Southeast Asian foragers'],
     summary: 'Descendants of the first modern humans in the region, who hunted, fished and tended forest plants. As seas rose after the Ice Age they drowned the Sunda shelf, turning hills into the islands of Indonesia and the Philippines. From about 2000 BC Austronesian farmers settled among them.' },
-  { id: 'neolithic-china', name: 'Neolithic China', start: -9000, end: -2000, peak: -3000, region: 'China',
+  { id: 'neolithic-china', name: 'Neolithic China', start: -10000, end: -2000, peak: -3000, region: 'China',
     capitals: [], place: [113.67, 33.6], match: [],
-    summary: 'Millet was domesticated along the Yellow River and rice along the Yangtze by about 7000 BC. Villages such as Jiahu (with the oldest playable flutes), Yangshao with its painted pottery, and Hemudu with its pile houses were followed by the jade-working Liangzhu culture, whose walled city (3300–2300 BC) preceded China’s Bronze Age states.' },
+    summary: 'Pottery-making foragers lived in China from the end of the Ice Age. Millet was domesticated along the Yellow River and rice along the Yangtze by about 7000 BC. Villages such as Jiahu (with the oldest playable flutes), Yangshao with its painted pottery, and Hemudu with its pile houses were followed by the jade-working Liangzhu culture, whose walled city (3300–2300 BC) preceded China’s Bronze Age states.' },
   { id: 'south-asia-early', name: 'Early farmers of South Asia', start: -7000, end: -700, peak: -2500, region: 'South Asia',
     capitals: [], place: [67.63, 29.39], match: ['Dravidians', 'Early Indus Valley villages'],
     summary: 'At Mehrgarh, below the Bolan Pass, people grew barley and wheat and herded zebu cattle by about 7000 BC. Farming villages spread across the subcontinent, alongside and after the Indus cities: ash-mound cattle herders in the Deccan, rice farmers along the Ganges. The source map labels much of the region by the Dravidian languages spoken there.' },
