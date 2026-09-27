@@ -8,6 +8,25 @@
 //   why     – the reason, kept for review
 
 export const CORRECTIONS = [
+  // ── Prehistory (10,000–3000 BC) ───────────────────────────────────────
+  { years: [-5000], from: '      ', to: 'Cardial Ware culture', why: 'The source leaves NAME blank; its ABBREVN is "Cardial Ware culture"' },
+  { years: [-10000, -8000], from: 'Okhotsk culture', to: 'Jōmon', why: 'The Okhotsk culture dates to c. AD 500–1200; northern Japan was Jōmon' },
+  { years: [-5000, -4000, -3000, -2000, -1500, -1000, -700, -500, -400], from: 'Ainu', to: 'Jōmon', why: 'Ainu culture took shape c. 13th century AD; before 300 BC Hokkaido was Jōmon' },
+  { years: [-323, -300, -200, -100, -1, 100, 200, 300, 400, 500, 600], from: 'Ainu', to: 'Epi-Jōmon', why: 'Ainu culture took shape c. 13th century AD; Hokkaido was Epi-Jōmon c. 300 BC–AD 700' },
+  { years: [700, 800, 900, 1000, 1100, 1200], from: 'Ainu', to: 'Satsumon culture', why: 'Ainu culture took shape c. 13th century AD; Hokkaido was Satsumon c. AD 700–1200' },
+  { years: [-10000, -8000, -5000, -4000, -3000], from: 'Austronesians', to: 'Island Southeast Asian foragers', why: 'Austronesian speakers left Taiwan only after c. 3000 BC' },
+  { years: [-8000, -5000, -4000], from: 'Bantu', to: 'West and Central African foragers', why: 'The Bantu expansion began c. 3000–2500 BC' },
+  { years: [-5000], from: 'Hurrian Kingdoms', to: 'Halaf–Ubaid Transitional', why: 'Hurrian states appear in the late 3rd millennium BC; c. 5000 BC northern Mesopotamia was Halaf–Ubaid' },
+  { years: [-4000], from: 'Hurrian Kingdoms', to: 'Northern Mesopotamian Chalcolithic', why: 'Hurrian states appear in the late 3rd millennium BC' },
+  { years: [-3000], from: 'Hurrian Kingdoms', to: 'Ninevite 5 culture', why: 'Hurrian states appear in the late 3rd millennium BC; c. 3000 BC northern Mesopotamia was Ninevite 5' },
+  { years: [-5000, -4000], from: 'Elam', to: 'Susiana culture', why: 'Elam (Proto-Elamite) begins c. 3200 BC; before it the Susiana plain had the Susiana culture' },
+  { years: [-5000, -4000], from: 'Norte Chico', to: 'Andean coastal foragers', why: 'Norte Chico begins c. 3500 BC' },
+  { years: [-5000], from: 'Naquada I', to: 'Early Neolithic Egypt', why: 'Naqada I begins c. 3900 BC' },
+  { years: [-5000], from: 'Funnel-Beaker', to: 'Stroked Pottery culture', why: 'The Funnelbeaker culture begins c. 4300 BC; c. 5000 BC the region had the Stroked Pottery culture' },
+  { years: [-5000], from: 'Ghassul', to: 'Wadi Rabah culture', why: 'The Ghassulian begins c. 4500 BC; c. 5000 BC the southern Levant had the Wadi Rabah culture' },
+  { years: [-4000], from: 'Indus valley civilization', to: 'Early Indus Valley villages', why: 'The Early Harappan phase begins c. 3300 BC' },
+  { years: [-4000, -3000], from: 'Kerma', to: 'Nubian A-Group', why: 'The Kerma culture begins c. 2500 BC; before it Lower Nubia had the A-Group' },
+
   // ── Ancient ────────────────────────────────────────────────────────────
   { years: [-4000], from: 'Egypt', to: 'Naqada culture', why: 'Egypt was unified c. 3100 BC; 4000 BC is the predynastic Naqada period' },
   { years: [-4000], from: 'Minoan', to: 'Neolithic Crete', why: 'Minoan civilisation begins c. 3100 BC' },
@@ -71,6 +90,7 @@ export const CORRECTIONS = [
 // so they flicker in and out as a "country" when scrubbing.
 export const REMOVALS = [
   { years: [1945, 1960], name: 'Antarctica', why: 'Never a state; the land is drawn by the coastline layer at every date' },
+  { years: [-5000], name: 'Kelteminar', why: 'A copy of the Central Asian Kelteminar culture drawn on New Zealand, which was uninhabited until c. AD 1280' },
 ];
 
 // Modern snapshots use Natural Earth 1:10m country shapes. These Natural Earth

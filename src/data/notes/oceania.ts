@@ -10,7 +10,7 @@ export const notes: CivInput[] = [
     capitals: [], place: [144.33, -5.78],
     match: ['Papuan neolithic farmers', 'Papuan', 'Papuans', 'Papua New Guinea'],
     summary: 'At Kuk Swamp in the New Guinea highlands people drained wetlands to grow taro and bananas by about 7000 BC, one of the world’s independent inventions of farming. The island’s hundreds of societies speak more than 800 languages, more than anywhere else on Earth.' },
-  { id: 'austronesians', name: 'Austronesian seafarers', start: -5000, end: -400, peak: -1500, region: 'Southeast Asia', areas: ['Southeast Asia', 'Oceania'],
+  { id: 'austronesians', name: 'Austronesian seafarers', start: -4000, end: -400, peak: -1500, region: 'Southeast Asia', areas: ['Southeast Asia', 'Oceania'],
     capitals: [], place: [120.9, 23.7], match: ['Austronesians', 'Dapenkeng culture'],
     summary: 'Farmers and sailors from Taiwan (the Dapenkeng culture) who, from about 3000 BC, spread by outrigger canoe through the Philippines and Indonesia, later across the Pacific and west as far as Madagascar: the widest expansion of any people before 1500.' },
   { id: 'polynesians', name: 'Lapita & Polynesian voyagers', start: -1500, end: 1800, peak: 1200, region: 'Polynesia',
