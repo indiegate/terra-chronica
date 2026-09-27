@@ -3,7 +3,8 @@ import earcut from 'earcut';
 import { CIVILISATIONS, capitalAt, civFor, type Capital, type Civilisation } from './data/civilisations';
 import { inkFor, isPeoples } from './format';
 import { Plates, rotateLonLat, type RotationModel } from './plates';
-import { PALEO_LABELS } from './data/geology';
+import { MAX_AGE, PALEO_LABELS } from './data/geology';
+import { EarlyEarth } from './layers/early-earth';
 import { Dinosaurs } from './dinos';
 import { playImpact } from './impact';
 import { Renderer, type Colours, type LandLayer, type RGBA, type TerritoryLayer, type View } from './gl/renderer';
@@ -54,6 +55,8 @@ export interface TerritoryHit {
 
 /** The Chicxulub impact (Ma): crossing it plays the impact animation. */
 const IMPACT_AGE = 66;
+/** Theia's collision with the early Earth (Ma), which formed the Moon. */
+const THEIA_AGE = 4500;
 
 /** Sphere radius used when pre-projecting the data (metres). */
 const EARTH_RADIUS = 6378137;
@@ -149,6 +152,7 @@ export class MapView {
     this.labelRoot = this.world.append('g').attr('class', 'labels');
     const dinoRoot = this.world.insert('g', '.labels').attr('class', 'dino-root');
     const prehistoryRoot = this.world.insert('g', '.labels').attr('class', 'prehistory');
+    const earlyRoot = this.world.insert('g', ':first-child').attr('class', 'early-root');
     this.paleoRoot = this.world.append('g').attr('class', 'paleo-labels');
     this.dinos = new Dinosaurs(
       this.svg,
@@ -178,6 +182,15 @@ export class MapView {
         { id: 'paleo-names', title: 'Past continents & oceans', group: 'earth', span: { fromBP: 1000e6, toBP: PRE_END }, defaultOn: true },
         (on) => void this.paleoRoot.classed('layer-off', !on),
       ),
+    );
+    this.addLayer(
+      new EarlyEarth({
+        svg: this.svg,
+        root: earlyRoot,
+        project: (lon, lat) => this.projection([lon, lat]) as [number, number] | null,
+        geoPath: () => d3.geoPath(this.projection),
+        plates: () => this.plates,
+      }),
     );
     this.addLayer(this.dinos);
     const ctx = {
@@ -351,10 +364,13 @@ export class MapView {
    */
   private landLayers() {
     const w = Math.max(0, Math.min(1, (this.age - BLOCKS_FROM) / (BLOCKS_FULL - BLOCKS_FROM)));
+    // Beyond the plate model, the schematic early Earth takes over.
+    const fade = 1 - EarlyEarth.weight(this.age);
     const coast = this.land();
     const out: { layer: LandLayer; alpha: number }[] = [];
-    if (this.blocks && w > 0) out.push({ layer: this.blocks, alpha: Math.min(1, 2 * w) });
-    if (coast && (w < 1 || !this.blocks)) out.push({ layer: coast, alpha: this.blocks ? Math.min(1, 2 * (1 - w)) : 1 });
+    if (fade <= 0) return out;
+    if (this.blocks && w > 0) out.push({ layer: this.blocks, alpha: Math.min(1, 2 * w) * fade });
+    if (coast && (w < 1 || !this.blocks)) out.push({ layer: coast, alpha: (this.blocks ? Math.min(1, 2 * (1 - w)) : 1) * fade });
     return out;
   }
 
@@ -416,7 +432,7 @@ export class MapView {
     const previous = this.age;
     this.age = Math.max(0, ma);
     this.time = time ?? (this.age > 0 ? deepTime(this.age) : historyTime(this.year));
-    this.plates!.setAge(this.age);
+    this.plates!.setAge(Math.min(this.age, MAX_AGE));
     const quats = new Float32Array(this.plateIds.length * 4);
     this.plateIds.forEach((id, i) => quats.set(this.plates!.rotation(id), i * 4));
     this.renderer.setRotations(quats);
@@ -432,6 +448,11 @@ export class MapView {
     if (!impact) this.updateLayers();
     this.ensureDetail();
     this.invalidate();
+    if (previous > THEIA_AGE && this.age <= THEIA_AGE && this.age > THEIA_AGE - 20 && performance.now() - this.lastImpact > 5000) {
+      this.lastImpact = performance.now();
+      const p = this.projection([0, 0]);
+      if (p) playImpact(this.stage, this.t.applyX(p[0]), this.t.applyY(p[1]));
+    }
     if (impact) {
       this.lastImpact = performance.now();
       this.dinos.fadeOut(900);

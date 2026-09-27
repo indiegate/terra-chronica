@@ -568,6 +568,21 @@ html, body {
 .dino-key div { display: flex; align-items: center; gap: 6px; line-height: 1.55; }
 .dino-key svg { width: 26px; height: 16px; fill: currentColor; }
 
+/* Early Earth, before the plate model (schematic). */
+.early-root { pointer-events: none; }
+.ee-sea { stroke: none; }
+.ee-magma { fill: #000; filter: url(#magma); }
+.ee-land {
+  fill: var(--land);
+  stroke: var(--ink);
+  stroke-opacity: 0.6;
+  stroke-width: 1;
+  stroke-dasharray: 4 3;
+  vector-effect: non-scaling-stroke;
+  pointer-events: visiblePainted;
+}
+.ee-note { font-family: var(--serif); font-style: italic; fill: var(--ink-soft); text-anchor: middle; }
+
 /* Human prehistory: species ranges, sites and dispersal routes. */
 .hom-range {
   fill: var(--c);

@@ -380,6 +380,13 @@ This is the most important physical layer, because it fixes what the map shows a
 
 ## 8. Before a billion years ago (4.54 billion to 1 billion years ago)
 
+> **Progress (2026-09-27):** done.
+> - The deep-time slider starts at 4.54 billion years ago; the first 3.5 billion take 16% of its width. It gets 7 Precambrian eon/era bands and 14 events.
+> - `src/layers/early-earth.ts` draws a sea tint and a magma ocean as SVG over the WebGL map, not as a shader, and schematic landmass stages that cross-fade.
+> - Theia's impact replays the impact animation. Rodinia's schematic stage sits where the plate model puts Rodinia, and the handover runs from 1,100 to 1,000 million years ago.
+>
+> With this, the timeline has no gaps from 4.54 billion years ago to AD 2010.
+
 - **Slider:** add a compressed segment to the left end of the deep-time slider, as a piecewise scale that gives 4,540–1,000 Ma about 15% of the width. Bands: Hadean, Archean, Paleoproterozoic, Mesoproterozoic.
 - **Map:** there is no plate model here, so switch to an "early Earth" mode. `MapView` hides the land meshes and draws a stylised globe (a shader over the sea pass):
   - A magma ocean (4.5 billion years ago)

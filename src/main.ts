@@ -2,7 +2,7 @@ import { MapView, esc, type TerritoryHit } from './map';
 import { Timeline } from './timeline';
 import { bracket, loadManifest, loadNameIndex } from './data/borders';
 import { CIVILISATIONS, ERAS, EVENTS, capitalAt, type Civilisation } from './data/civilisations';
-import { GEO_EVENTS, MAX_AGE, PERIODS, ageParts, formatAge, formatAgeShort, periodAt } from './data/geology';
+import { EARTH_AGE, GEO_EVENTS, MAX_AGE, PERIODS, ageParts, formatAge, formatAgeShort, periodAt } from './data/geology';
 import { formatSpan, formatYear, inkFor } from './format';
 import { LayersPanel } from './layers/panel';
 import { EPOCHS, PRE_END, PRE_EVENTS, PRE_START, SITES, SPECIES_BY_ID, epochAt, siteState, speciesAt, stageAt, type Site } from './data/prehistory';
@@ -39,15 +39,24 @@ const timeline = new Timeline($('#timeline'), {
   tickFormat: formatYear,
 });
 
-// Deep time: square-root scale of age. The Precambrian takes about a quarter of the width;
+// Deep time: the Earth's first 3.5 billion years (before the plate model) are
+// compressed into the left of the slider; from 1 billion years ago a
+// square-root scale of age, where the Precambrian takes about a quarter and
 // Paleozoic, Mesozoic and Cenozoic share the rest roughly equally.
+const EARLY_W = 0.16;
 const deepline = new Timeline($('#deepline'), {
-  toPos: (a) => 1 - Math.sqrt(Math.max(0, a) / MAX_AGE),
-  fromPos: (p) => MAX_AGE * (1 - p) ** 2,
-  round: (a) => (a >= 10 ? Math.round(a) : a >= 1 ? Math.round(a * 10) / 10 : Math.round(a * 1000) / 1000),
-  bands: PERIODS.map((p) => ({ name: p.name, start: Math.min(p.start, MAX_AGE), end: p.end, color: `color-mix(in srgb, ${p.color} 40%, #f6eedb)` })),
+  toPos: (a) =>
+    a > MAX_AGE
+      ? (EARLY_W * (EARTH_AGE - Math.min(a, EARTH_AGE))) / (EARTH_AGE - MAX_AGE)
+      : EARLY_W + (1 - EARLY_W) * (1 - Math.sqrt(Math.max(0, a) / MAX_AGE)),
+  fromPos: (p) =>
+    p < EARLY_W
+      ? EARTH_AGE - (p / EARLY_W) * (EARTH_AGE - MAX_AGE)
+      : MAX_AGE * (1 - (p - EARLY_W) / (1 - EARLY_W)) ** 2,
+  round: (a) => (a >= 1000 ? Math.round(a / 10) * 10 : a >= 10 ? Math.round(a) : a >= 1 ? Math.round(a * 10) / 10 : Math.round(a * 1000) / 1000),
+  bands: PERIODS.map((p) => ({ name: p.name, start: Math.min(p.start, EARTH_AGE), end: p.end, color: `color-mix(in srgb, ${p.color} 40%, #f6eedb)` })),
   events: GEO_EVENTS,
-  ticks: [1000, 900, 800, 720, 635, 539, 500, 450, 400, 350, 300, 252, 200, 150, 100, 66, 34, 10, 2.58, 0],
+  ticks: [4540, 4000, 3000, 2000, 1000, 900, 800, 720, 635, 539, 500, 450, 400, 350, 300, 252, 200, 150, 100, 66, 34, 10, 2.58, 0],
   format: formatAge,
   tickFormat: formatAgeShort,
 });
@@ -156,7 +165,7 @@ function readHash(): Mode {
   const k = location.hash.match(/ka=([\d.]+)/);
   const y = location.hash.match(/year=(-?\d+)/);
   const l = location.hash.match(/layers=([\w,-]*)/);
-  age = a ? Math.max(0, Math.min(MAX_AGE, Number(a[1]) || 0)) : 0;
+  age = a ? Math.max(0, Math.min(EARTH_AGE, Number(a[1]) || 0)) : 0;
   if (k) preBP = clampBP((Number(k[1]) || 0) * 1000);
   if (y) year = Math.max(MIN_YEAR, Math.min(MAX_YEAR, Number(y[1]) || 1));
   applyLayers(l ? new Set(l[1].split(',').filter(Boolean)) : null);
@@ -214,7 +223,7 @@ async function setYear(y: number) {
 
 /** Show land as it was `a` million years ago; 0 returns to human history. */
 async function setAge(a: number) {
-  const next = Math.max(0, Math.min(MAX_AGE, a));
+  const next = Math.max(0, Math.min(EARTH_AGE, a));
   if (next <= 0) return setYear(year);
   enterMode('deep');
   age = next;
@@ -223,7 +232,7 @@ async function setAge(a: number) {
   const [num, unit] = ageParts(age);
   yearEl.innerHTML = `${esc(num)} <small>${esc(unit)}</small>`;
   eraEl.textContent = period.name;
-  surveyEl.textContent = `${period.era} era`;
+  surveyEl.textContent = `${period.era} ${period.rank ?? 'era'}`;
   writeHash();
   layersPanel.setTime(deepTime(age));
   if (info.classList.contains('period')) renderPeriod();
@@ -399,7 +408,7 @@ function renderPeriod() {
     <h2>${esc(p.name)}</h2>
     <p class="summary">${esc(p.summary)}</p>
     <dl>
-      <dt>Era</dt><dd>${esc(p.era)}</dd>
+      <dt>${p.rank === 'eon' ? 'Eon' : 'Era'}</dt><dd>${esc(p.era)}</dd>
       <dt>Span</dt><dd>${formatAgeShort(p.start)} – ${formatAgeShort(p.end)}</dd>
       ${events.length ? `<dt>Events</dt><dd>${events.map((e) => `${esc(e.label)} <span class="muted">${formatAgeShort(e.value)}</span>`).join('<br>')}</dd>` : ''}
     </dl>
@@ -605,10 +614,10 @@ window.addEventListener('hashchange', () => {
   [snapshots, nameIndex] = await Promise.all([loadManifest(), loadNameIndex()]);
   snapshots = snapshots.filter((y) => y >= MIN_YEAR);
   timeline.setSnaps(snapshots);
-  const [startAge, startBP] = [age, preBP];
-  await setYear(year);
-  if (urlMode === 'deep') await setAge(startAge);
-  else if (urlMode === 'pre') await setPre(startBP);
+  // Go straight to the date in the URL (going through human history first would rewrite the URL meanwhile).
+  if (urlMode === 'deep') await setAge(age);
+  else if (urlMode === 'pre') await setPre(preBP);
+  else await setYear(year);
   document.body.classList.add('ready');
 })();
 

@@ -1,6 +1,6 @@
 # Complete History
 
-An interactive parchment-style world atlas: drifting continents from a billion years ago, then the peoples, kingdoms and empires of the last 12,000 years (10,000 BC to AD 2010).
+An interactive parchment-style world atlas: the Earth from its formation 4.54 billion years ago, drifting continents from a billion years ago, the first humans, then the peoples, kingdoms and empires of the last 12,000 years (10,000 BC to AD 2010).
 
 ```bash
 npm install
@@ -13,8 +13,9 @@ npm run coverage   # how evenly the notes cover each world area and period
 ## Using it
 
 - **Map:** scroll or pinch to zoom, drag to pan, click a territory or a ★ capital for details. Use `⌂` to reset the view.
-- **Three sliders:** geological time (1 billion years ago to today), human prehistory (7 million years ago to 10,000 BC, on a log scale) and human history (10,000 BC to AD 2010). Only one is active; the others are dimmed until you touch them, with their handles kept on the same moment. Drag a seal, click a band (period or era) or a ◆ event. `←/→` step through time, `Shift+←/→` jump between border surveys, `Space` plays or pauses. Playing deep time flows on into prehistory, and prehistory into human history.
+- **Three sliders:** geological time (4.54 billion years ago to today; the first 3.5 billion compressed at its left end), human prehistory (7 million years ago to 10,000 BC, on a log scale) and human history (10,000 BC to AD 2010). Only one is active; the others are dimmed until you touch them, with their handles kept on the same moment. Drag a seal, click a band (period or era) or a ◆ event. `←/→` step through time, `Shift+←/→` jump between border surveys, `Space` plays or pauses. Playing deep time flows on into prehistory, and prehistory into human history.
 - **Deep time:** continents drift to where their plates were; past continents and oceans are labelled (Gondwana, Pangaea, Tethys…). Click the map for the current geological period.
+- **Early Earth:** before 1 billion years ago there is no plate model, so the map turns schematic: a magma ocean after the Moon-forming impact, iron-rich seas with the first cratons, then Vaalbara, Kenorland and Columbia (Nuna), and Rodinia assembling where the plate model later places it. Every landmass is labelled *schematic*; the sea's tint follows its chemistry, clearing after the Great Oxidation Event.
 - **Dinosaurs:** from the Triassic to the end of the Cretaceous, shaded zones show where five dinosaur groups lived, each marked with a silhouette (hover for details). Crossing 66 million years ago plays the Chicxulub asteroid impact and the zones fade out.
 - **Search:** press `/` to search any civilisation or polity and fly to it.
 - **Layers:** the stacked-sheets button under the zoom controls switches map layers on and off (realms, capitals, past continents, dinosaurs). Layers with nothing to show at the current date are greyed out. Your choice is remembered in this browser and added to the URL when it differs from the defaults (`&layers=capitals,dinosaurs`).
@@ -29,7 +30,7 @@ npm run coverage   # how evenly the notes cover each world area and period
   - Naming errors and anachronisms in the source are corrected in `scripts/corrections.mjs`, each with its reason.
   - Each snapshot has a simplified `.lo.json` (2 km tolerance) for the zoomed-out view; full detail loads from 4× zoom.
 - **Land and plates:** Natural Earth coastlines (1:110m, 1:50m, 1:10m by zoom) split along the static polygons of the [Merdith et al. 2021](https://doi.org/10.5281/zenodo.10346399) plate model (CC BY 4.0), so each piece belongs to a tectonic plate. The model's rotations (`rotations.json`) place every plate at any age up to 1 billion years ago; the client reproduces GPlates' reconstructions to within metres. Before the Cambrian (from 540 to 600 million years ago) the map fades from today's coastline shapes to the model's continental blocks (`plates-blocks.json`), since modern shapes would be anachronistic that far back.
-- **Geological periods and events** (`src/data/geology.ts`): dates and colours from the International Chronostratigraphic Chart; past-continent and ocean labels are anchored to plates and placed by the same rotations as the land.
+- **Geological periods and events** (`src/data/geology.ts`): dates and colours from the International Chronostratigraphic Chart, with the eons and eras of the Precambrian back to the Hadean; past-continent and ocean labels are anchored to plates and placed by the same rotations as the land.
 - **Dinosaur finds:** [Paleobiology Database](https://paleobiodb.org) (CC BY 4.0), fetched by clade in `scripts/build-dinos.mjs`. Sites dated to within 25 million years, one per site and age range; each is placed on its plate and moved with the plate model. Zones are density contours of sites alive within ±3 million years of the current age. The silhouettes are drawn for this project.
 - **Prehistory** (`src/data/prehistory.ts`): hand-curated from the published dates of each site (65 sites, 8 routes, species ranges). Where dates are debated (Madjedbebe, White Sands) the site card says so. Ranges and routes are schematic, drawn from the sites that anchor them; they are not surveyed boundaries, and the coastlines are today's (Ice Age sea levels are a planned addition).
 - **Civilisation notes** (`src/data/civilisations.ts`): hand-written entries with dates, capitals (changing over time) and short summaries, linked to polygon names within each civilisation's own dates. The same file holds the eras and timeline events.
