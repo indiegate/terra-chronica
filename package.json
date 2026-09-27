@@ -9,7 +9,9 @@
     "data:dinos": "node scripts/build-dinos.mjs",
     "dev": "vite",
     "build": "tsc && vite build",
-    "preview": "vite preview"
+    "preview": "vite preview",
+    "coverage": "vite-node scripts/coverage.ts",
+    "test": "vitest run"
   },
   "dependencies": {
     "d3": "^7.9.0",
@@ -23,6 +25,7 @@
     "@types/topojson-client": "^3.1.5",
     "mapshaper": "^0.7.67",
     "typescript": "^5.9.3",
-    "vite": "^6.4.3"
+    "vite": "^6.4.3",
+    "vitest": "^3.2.7"
   }
 }

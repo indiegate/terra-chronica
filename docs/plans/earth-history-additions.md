@@ -105,8 +105,8 @@ The borders cover the whole span, but the hand-written content does not. `src/da
 - **Eras:** Mesolithic → Medieval → Modern is a European periodisation, shown as if it applied to the whole world.
 
 ### 1.1 Coverage audit (tooling first)
-- Add `region` values from a fixed list: Mesopotamia & Levant, Egypt & North Africa, West Africa, East Africa, Central & Southern Africa, Europe, Steppe & Central Asia, South Asia, China, Korea & Japan, Southeast Asia, Oceania, North America, Mesoamerica, Andes & South America, Arctic.
-- Add `scripts/coverage.mjs`, which prints a region × century matrix of civilisations and events. It also lists every large polygon (by area, per snapshot) that has no linked civilisation.
+- Done: `src/data/regions.ts` defines 17 world areas: Near East, Iran, North Africa, West Africa, East Africa, Central & Southern Africa, Europe, Steppe & Central Asia, South Asia, China, Korea & Japan, Southeast Asia, Oceania, North America, Mesoamerica, South America and Arctic. Every civilisation and event now has an area. An empire counts only for its home area, so the British Empire doesn't fill India's gap.
+- Done: `npm run coverage` (`scripts/coverage.ts`) prints two grids: civilisation notes by area × period, and events by area × 500 years. It also lists every border polygon covering 0.5% or more of a snapshot's mapped land that has no note; `--all` lists every unlinked polygon.
 - **Target:** every region has at least one civilisation or culture note active in every millennium from 8000 BC, and in every century from AD 1. Every inhabited region has at least one event every 500 years.
 
 ### 1.2 Content to add

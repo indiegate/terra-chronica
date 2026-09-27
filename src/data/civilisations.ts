@@ -3,6 +3,8 @@
 // snapshots that belong to each civilisation. A polygon is linked only when the
 // snapshot year falls within the civilisation's own start–end dates.
 
+import { areasFor, type Area } from './regions';
+
 export interface Capital {
   name: string;
   lon: number;
@@ -18,13 +20,16 @@ export interface Civilisation {
   end: number;
   peak: number;
   capitals: Capital[];
+  /** Shown in the info panel. */
   region: string;
+  /** World areas the note covers (see regions.ts). */
+  areas: Area[];
   match: string[];
   summary: string;
 }
 
 type CapitalInput = [name: string, lon: number, lat: number, from?: number, to?: number];
-type CivInput = Omit<Civilisation, 'capitals'> & { capitals: CapitalInput[] };
+type CivInput = Omit<Civilisation, 'capitals' | 'areas'> & { capitals: CapitalInput[]; areas?: Area[] };
 
 const DATA: CivInput[] = [
   // ── Cradles of civilisation ──────────────────────────────────────────
@@ -97,10 +102,10 @@ const DATA: CivInput[] = [
   { id: 'ptolemaic', name: 'Ptolemaic Egypt', start: -305, end: -30, peak: -250, region: 'North Africa',
     capitals: [['Alexandria', 29.92, 31.2]], match: ['Ptolemaic Kingdom'],
     summary: 'The Greek dynasty of Egypt, patrons of the Library of Alexandria; its last ruler was Cleopatra VII.' },
-  { id: 'carthage', name: 'Carthage', start: -814, end: -146, peak: -300, region: 'Mediterranean',
+  { id: 'carthage', name: 'Carthage', start: -814, end: -146, peak: -300, region: 'Mediterranean', areas: ['North Africa'],
     capitals: [['Carthage', 10.32, 36.85]], match: ['Carthaginian Empire', 'Carthage'],
     summary: 'A Phoenician colony that became a western Mediterranean trading empire and Rome’s great rival in the Punic Wars.' },
-  { id: 'rome', name: 'Rome', start: -509, end: 476, peak: 117, region: 'Mediterranean',
+  { id: 'rome', name: 'Rome', start: -509, end: 476, peak: 117, region: 'Mediterranean', areas: ['Europe', 'Near East', 'North Africa'],
     capitals: [['Rome', 12.5, 41.9, -509, 402], ['Ravenna', 12.2, 44.42, 402, 476]],
     match: ['Rome', 'Roman Republic', 'Roman Empire', 'Western Roman Empire', 'Rome (Constantinus)', 'Rome (Maximian)', 'Rome (Galerius)', 'Rome (Diocletianus)'],
     summary: 'From republic to empire, Rome united the Mediterranean world, leaving law, roads, Latin and a template for later states.' },
@@ -142,7 +147,7 @@ const DATA: CivInput[] = [
   { id: 'gupta', name: 'Gupta Empire', start: 320, end: 550, peak: 400, region: 'South Asia',
     capitals: [['Pataliputra', 85.14, 25.6]], match: ['Gupta Empire'],
     summary: 'India’s classical “golden age”: Aryabhata’s mathematics and astronomy, Kalidasa’s poetry, and a flowering of Hindu and Buddhist art.' },
-  { id: 'byzantium', name: 'Byzantine Empire', start: 395, end: 1453, peak: 555, region: 'Mediterranean',
+  { id: 'byzantium', name: 'Byzantine Empire', start: 395, end: 1453, peak: 555, region: 'Mediterranean', areas: ['Europe', 'Near East'],
     capitals: [['Constantinople', 28.98, 41.01, 395, 1204], ['Nicaea', 29.72, 40.43, 1204, 1261], ['Constantinople', 28.98, 41.01, 1261, 1453]],
     match: ['Eastern Roman Empire', 'Byzantine Empire'],
     summary: 'The eastern half of the Roman Empire, which survived a thousand years after the fall of the west and preserved Greek learning.' },
@@ -159,7 +164,7 @@ const DATA: CivInput[] = [
   { id: 'tibet', name: 'Tibetan Empire', start: 618, end: 842, peak: 790, region: 'Central Asia',
     capitals: [['Lhasa', 91.13, 29.65]], match: ['Tibetan Empire', 'Tufan Empire'],
     summary: 'A high-plateau empire that briefly captured Chang’an and contested the Silk Road with Tang China.' },
-  { id: 'caliphate', name: 'Islamic Caliphates', start: 632, end: 1258, peak: 740, region: 'Near East',
+  { id: 'caliphate', name: 'Islamic Caliphates', start: 632, end: 1258, peak: 740, region: 'Near East', areas: ['Near East', 'Iran', 'North Africa'],
     capitals: [['Medina', 39.61, 24.47, 632, 661], ['Damascus', 36.29, 33.51, 661, 750], ['Kufa', 44.4, 32.03, 750, 762], ['Baghdad', 44.37, 33.31, 762, 1258]],
     match: ['Umayyad Caliphate', 'Abbasid Caliphate'],
     summary: 'The Umayyad and Abbasid caliphates stretched from Iberia to the Indus; Abbasid Baghdad’s House of Wisdom became a centre of learning.' },
@@ -201,7 +206,7 @@ const DATA: CivInput[] = [
     capitals: [['Nishapur', 58.8, 36.21, 1037, 1051], ['Isfahan', 51.67, 32.65, 1051, 1118], ['Merv', 62.19, 37.66, 1118, 1157], ['Hamadan', 48.52, 34.8, 1157, 1194]],
     match: ['Seljuk Empire'],
     summary: 'Turkic rulers of Persia and Anatolia whose victory at Manzikert (1071) opened Anatolia to Turkish settlement.' },
-  { id: 'mongol', name: 'Mongol Empire', start: 1206, end: 1368, peak: 1279, region: 'Eurasia',
+  { id: 'mongol', name: 'Mongol Empire', start: 1206, end: 1368, peak: 1279, region: 'Eurasia', areas: ['Steppe & Central Asia', 'China', 'Iran'],
     capitals: [['Karakorum', 102.83, 47.2, 1235, 1264], ['Khanbaliq', 116.4, 39.9, 1264, 1368]],
     match: ['Great Khanate', 'Ilkhanate', 'Khanate of the Golden Horde', 'Chagatai Khanate'],
     summary: 'Founded by Genghis Khan, the largest contiguous land empire in history, stretching from Korea to Eastern Europe.' },
@@ -226,7 +231,7 @@ const DATA: CivInput[] = [
     summary: 'The great Hindu empire of the Deccan; its capital at Hampi was among the largest cities in the world until it was sacked in 1565.' },
 
   // ── Early modern ─────────────────────────────────────────────────────
-  { id: 'ottoman', name: 'Ottoman Empire', start: 1299, end: 1922, peak: 1683, region: 'Near East',
+  { id: 'ottoman', name: 'Ottoman Empire', start: 1299, end: 1922, peak: 1683, region: 'Near East', areas: ['Near East', 'Europe', 'North Africa'],
     capitals: [['Söğüt', 30.18, 40.02, 1299, 1326], ['Bursa', 29.06, 40.19, 1326, 1365], ['Edirne', 26.56, 41.68, 1365, 1453], ['Constantinople', 28.98, 41.01, 1453, 1922]],
     match: ['Ottoman Empire', 'Ottoman Sultanate'],
     summary: 'A Turkish dynasty that took Constantinople in 1453 and ruled across three continents for six centuries.' },
@@ -247,11 +252,11 @@ const DATA: CivInput[] = [
   { id: 'songhai', name: 'Songhai Empire', start: 1464, end: 1591, peak: 1520, region: 'West Africa',
     capitals: [['Gao', -0.04, 16.27]], match: ['Songhai'],
     summary: 'The largest of the Sahelian empires, ruling the Niger bend until a Moroccan invasion in 1591.' },
-  { id: 'spain', name: 'Spanish Empire', start: 1492, end: 1898, peak: 1790, region: 'Global',
+  { id: 'spain', name: 'Spanish Empire', start: 1492, end: 1898, peak: 1790, region: 'Global', areas: ['Europe'],
     capitals: [['Toledo', -4.02, 39.86, 1492, 1561], ['Madrid', -3.7, 40.42, 1561, 1898]],
     match: ['Spain', 'Castille', 'Viceroyalty of New Spain', 'Viceroyalty of Peru', 'Cuba (Spain)', 'Hispaniola (Spain)'],
     summary: 'One of the first global empires, spanning the Americas, the Philippines and parts of Europe.' },
-  { id: 'portugal', name: 'Portuguese Empire', start: 1415, end: 1999, peak: 1600, region: 'Global',
+  { id: 'portugal', name: 'Portuguese Empire', start: 1415, end: 1999, peak: 1600, region: 'Global', areas: ['Europe'],
     capitals: [['Lisbon', -9.14, 38.72, 1415, 1808], ['Rio de Janeiro', -43.17, -22.91, 1808, 1821], ['Lisbon', -9.14, 38.72, 1821, 1999]],
     match: ['Portugal', 'Portuguese Brazil', 'Viceroyalty of Brazil', 'Portuguese East Africa'],
     summary: 'A pioneering maritime empire of trading posts from Brazil to Macau that lasted nearly six centuries.' },
@@ -263,7 +268,7 @@ const DATA: CivInput[] = [
     capitals: [['Agra', 78.01, 27.18, 1526, 1571], ['Fatehpur Sikri', 77.66, 27.09, 1571, 1585], ['Lahore', 74.34, 31.55, 1585, 1598], ['Agra', 78.01, 27.18, 1598, 1648], ['Delhi', 77.23, 28.66, 1648, 1857]],
     match: ['Mughal Empire'],
     summary: 'A Persianate dynasty that ruled most of South Asia and built the Taj Mahal.' },
-  { id: 'russia', name: 'Russian Empire', start: 1547, end: 1917, peak: 1866, region: 'Eurasia',
+  { id: 'russia', name: 'Russian Empire', start: 1547, end: 1917, peak: 1866, region: 'Eurasia', areas: ['Europe', 'Steppe & Central Asia'],
     capitals: [['Moscow', 37.62, 55.76, 1547, 1712], ['St Petersburg', 30.32, 59.94, 1712, 1728], ['Moscow', 37.62, 55.76, 1728, 1732], ['St Petersburg', 30.32, 59.94, 1732, 1917]],
     match: ['Tsardom of Muscovy', 'Russian Empire'],
     summary: 'From the Tsardom of Muscovy to a transcontinental empire reaching the Pacific and Alaska.' },
@@ -274,7 +279,7 @@ const DATA: CivInput[] = [
     capitals: [['Kraków', 19.94, 50.06, 1569, 1596], ['Warsaw', 21.01, 52.23, 1596, 1795]],
     match: ['Poland-Lithuania', 'Polish–Lithuanian Commonwealth'],
     summary: 'A vast elective monarchy with a powerful noble parliament, among the largest states of early-modern Europe.' },
-  { id: 'britain', name: 'British Empire', start: 1707, end: 1997, peak: 1920, region: 'Global',
+  { id: 'britain', name: 'British Empire', start: 1707, end: 1997, peak: 1920, region: 'Global', areas: ['Europe'],
     capitals: [['London', -0.13, 51.51]],
     match: ['United Kingdom', 'United Kingdom of Great Britain and Ireland', 'British Raj', 'British American colonies'],
     summary: 'At its height the largest empire in history, covering nearly a quarter of the world’s land.' },
@@ -282,13 +287,14 @@ const DATA: CivInput[] = [
     capitals: [['Philadelphia', -75.17, 39.95, 1776, 1800], ['Washington', -77.04, 38.9, 1800, 2010]],
     match: ['United States of America', 'United States'],
     summary: 'A federal republic born of revolution in 1776 that expanded across the continent and became a global power.' },
-  { id: 'ussr', name: 'Soviet Union', start: 1922, end: 1991, peak: 1960, region: 'Eurasia',
+  { id: 'ussr', name: 'Soviet Union', start: 1922, end: 1991, peak: 1960, region: 'Eurasia', areas: ['Europe', 'Steppe & Central Asia'],
     capitals: [['Moscow', 37.62, 55.76]], match: ['USSR'],
     summary: 'A one-party socialist federation that spanned eleven time zones and rivalled the United States in the Cold War.' },
 ];
 
 export const CIVILISATIONS: Civilisation[] = DATA.map((c) => ({
   ...c,
+  areas: areasFor(c.id, c.region, c.areas),
   capitals: c.capitals.map(([name, lon, lat, from = c.start, to = c.end]) => ({ name, lon, lat, from, to })),
 }));
 
@@ -322,34 +328,39 @@ export const ERAS: Era[] = [
   { name: 'Modern', start: 1800, end: 2010 },
 ];
 
-export interface HistoricEvent { year: number; label: string }
+export interface HistoricEvent {
+  year: number;
+  label: string;
+  /** Where it happened; 'World' for events with no single place. */
+  area: Area | 'World';
+}
 
 export const EVENTS: HistoricEvent[] = [
-  { year: -9500, label: 'Göbekli Tepe raised' },
-  { year: -8000, label: 'Farming spreads from the Fertile Crescent' },
-  { year: -3200, label: 'Writing invented in Sumer' },
-  { year: -2560, label: 'Great Pyramid of Giza completed' },
-  { year: -1754, label: 'Code of Hammurabi' },
-  { year: -1274, label: 'Battle of Kadesh' },
-  { year: -776, label: 'First Olympic Games' },
-  { year: -509, label: 'Roman Republic founded' },
-  { year: -323, label: 'Death of Alexander the Great' },
-  { year: -221, label: 'Qin unifies China' },
-  { year: -44, label: 'Assassination of Julius Caesar' },
-  { year: 476, label: 'Fall of the Western Roman Empire' },
-  { year: 622, label: 'The Hijra; Islamic calendar begins' },
-  { year: 800, label: 'Charlemagne crowned emperor' },
-  { year: 1066, label: 'Norman conquest of England' },
-  { year: 1206, label: 'Genghis Khan unites the Mongols' },
-  { year: 1347, label: 'Black Death reaches Europe' },
-  { year: 1453, label: 'Fall of Constantinople' },
-  { year: 1492, label: 'Columbus reaches the Americas' },
-  { year: 1521, label: 'Fall of Tenochtitlan' },
-  { year: 1648, label: 'Peace of Westphalia' },
-  { year: 1776, label: 'American Declaration of Independence' },
-  { year: 1789, label: 'French Revolution' },
-  { year: 1815, label: 'Congress of Vienna' },
-  { year: 1914, label: 'First World War begins' },
-  { year: 1945, label: 'End of the Second World War' },
-  { year: 1991, label: 'Dissolution of the Soviet Union' },
+  { year: -9500, label: 'Göbekli Tepe raised', area: 'Near East' },
+  { year: -8000, label: 'Farming spreads from the Fertile Crescent', area: 'Near East' },
+  { year: -3200, label: 'Writing invented in Sumer', area: 'Near East' },
+  { year: -2560, label: 'Great Pyramid of Giza completed', area: 'North Africa' },
+  { year: -1754, label: 'Code of Hammurabi', area: 'Near East' },
+  { year: -1274, label: 'Battle of Kadesh', area: 'Near East' },
+  { year: -776, label: 'First Olympic Games', area: 'Europe' },
+  { year: -509, label: 'Roman Republic founded', area: 'Europe' },
+  { year: -323, label: 'Death of Alexander the Great', area: 'Near East' },
+  { year: -221, label: 'Qin unifies China', area: 'China' },
+  { year: -44, label: 'Assassination of Julius Caesar', area: 'Europe' },
+  { year: 476, label: 'Fall of the Western Roman Empire', area: 'Europe' },
+  { year: 622, label: 'The Hijra; Islamic calendar begins', area: 'Near East' },
+  { year: 800, label: 'Charlemagne crowned emperor', area: 'Europe' },
+  { year: 1066, label: 'Norman conquest of England', area: 'Europe' },
+  { year: 1206, label: 'Genghis Khan unites the Mongols', area: 'Steppe & Central Asia' },
+  { year: 1347, label: 'Black Death reaches Europe', area: 'Europe' },
+  { year: 1453, label: 'Fall of Constantinople', area: 'Europe' },
+  { year: 1492, label: 'Columbus reaches the Americas', area: 'Mesoamerica' },
+  { year: 1521, label: 'Fall of Tenochtitlan', area: 'Mesoamerica' },
+  { year: 1648, label: 'Peace of Westphalia', area: 'Europe' },
+  { year: 1776, label: 'American Declaration of Independence', area: 'North America' },
+  { year: 1789, label: 'French Revolution', area: 'Europe' },
+  { year: 1815, label: 'Congress of Vienna', area: 'Europe' },
+  { year: 1914, label: 'First World War begins', area: 'World' },
+  { year: 1945, label: 'End of the Second World War', area: 'World' },
+  { year: 1991, label: 'Dissolution of the Soviet Union', area: 'Europe' },
 ];
