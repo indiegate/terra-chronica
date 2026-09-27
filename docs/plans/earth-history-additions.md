@@ -158,6 +158,11 @@ Each entry follows the existing format: dates, capitals over time, `match` names
   The region is chosen from the view centre.
 - **Sources:** each entry cites a standard reference in a code comment, as the corrections do. Examples: the Cambridge World History, Oxford Handbooks, and the Seshat Global History Databank for dates.
 
+> **Status (2026-09-28): complete.**
+> - `npm run coverage`: 0 of 527 note cells empty; 0 of 306 event cells empty (35 acknowledged prehistoric gaps); 0 unlinked polygon names in any snapshot (from 2,459).
+> - About 490 notes (from 72), about 400 events (from 27), and about 330 correction rules. Umbrella notes cover small peoples.
+> - Tests guard the links and modern-state anachronisms.
+
 ### 1.3 Border snapshots
 - The source (historical-basemaps) has no snapshots between 10,000 BC and 8000 BC, or between 8000 BC and 5000 BC. Check upstream for newer snapshots before any hand-drawing.
 - Where there are none, the Neolithic stretch relies on the culture notes (1.2), plus the farming spread (11) and the sea-level and ice changes (3). Don't invent borders.

@@ -7,7 +7,10 @@ npm install
 npm run dev        # http://localhost:5173
 npm run build      # static site in dist/
 npm test           # unit tests (Vitest)
-npm run coverage   # how evenly the notes cover each world area and period
+npm run coverage   # how evenly the notes and events cover each world area and period
+npm run names -- <regex>   # look up border-polygon names (for a note's match list)
+npm run where -- <name> [year]   # where a polygon lies
+npm run umbrella   # regenerate the umbrella notes' polygon lists
 ```
 
 ## Using it
@@ -27,13 +30,15 @@ npm run coverage   # how evenly the notes cover each world area and period
 - **Borders:** [historical-basemaps](https://github.com/aourednik/historical-basemaps) by A. Ourednik (GPL-3.0), 52 snapshots. Between two snapshots, the map fades from the earlier borders to the later ones.
   - Kept at full source resolution and clipped to the Natural Earth 1:10m coastline. Inland borders are only as detailed as the source.
   - 1994, 2000 and 2010 use Natural Earth 1:10m country borders, named after the source polygon they overlap most. Crimea is kept in Ukraine, as it was in 2010 (Natural Earth shows today's de facto control).
-  - Naming errors and anachronisms in the source are corrected in `scripts/corrections.mjs`, each with its reason.
+  - Naming errors and anachronisms in the source are corrected in `scripts/corrections.mjs`, each with its reason: about 330 rules, among them polygons named after states that did not yet exist (colonies in 1914–1960 drawn as the countries they later became, “Ainu” in 5000 BC), or no longer existed (the Liao in 1200), misplaced labels (“Rajput Clans” in South-East Asia, “Sotho” in the Niger Delta), misspellings and lakes stored as polities.
   - Each snapshot has a simplified `.lo.json` (2 km tolerance) for the zoomed-out view; full detail loads from 4× zoom.
 - **Land and plates:** Natural Earth coastlines (1:110m, 1:50m, 1:10m by zoom) split along the static polygons of the [Merdith et al. 2021](https://doi.org/10.5281/zenodo.10346399) plate model (CC BY 4.0), so each piece belongs to a tectonic plate. The model's rotations (`rotations.json`) place every plate at any age up to 1 billion years ago; the client reproduces GPlates' reconstructions to within metres. Before the Cambrian (from 540 to 600 million years ago) the map fades from today's coastline shapes to the model's continental blocks (`plates-blocks.json`), since modern shapes would be anachronistic that far back.
 - **Geological periods and events** (`src/data/geology.ts`): dates and colours from the International Chronostratigraphic Chart, with the eons and eras of the Precambrian back to the Hadean; past-continent and ocean labels are anchored to plates and placed by the same rotations as the land.
 - **Dinosaur finds:** [Paleobiology Database](https://paleobiodb.org) (CC BY 4.0), fetched by clade in `scripts/build-dinos.mjs`. Sites dated to within 25 million years, one per site and age range; each is placed on its plate and moved with the plate model. Zones are density contours of sites alive within ±3 million years of the current age. The silhouettes are drawn for this project.
 - **Prehistory** (`src/data/prehistory.ts`): hand-curated from the published dates of each site (65 sites, 8 routes, species ranges). Where dates are debated (Madjedbebe, White Sands) the site card says so. Ranges and routes are schematic, drawn from the sites that anchor them; they are not surveyed boundaries, and the coastlines are today's (Ice Age sea levels are a planned addition).
-- **Civilisation notes** (`src/data/civilisations.ts`): hand-written entries with dates, capitals (changing over time) and short summaries, linked to polygon names within each civilisation's own dates. The same file holds the eras and timeline events.
+- **Civilisation notes** (`src/data/civilisations.ts` and `src/data/notes/`): about 490 hand-written entries with dates, capitals (changing over time) or a key place, and short summaries, linked to polygon names within each note's own dates. Every polygon of every snapshot links to a note: most by name, the hundreds of small peoples of the 1492 Americas, 1600–1815 Australia and similar surveys through *umbrella* notes that claim unclaimed polygons inside a box and date range (`npm run umbrella` writes `src/data/notes/umbrella.json`).
+- **Timeline events**: about 400, filed by world area. `npm run coverage` checks that every area has notes in every period and events in every millennium before 3000 BC and every 500 years after; 35 deep-prehistory cells without a precisely dated event are listed with their reasons in `src/data/notes/events.ts`.
+- Tests check that every `match` name exists in the snapshots and links within its note's dates, and that no name meaning only a modern state appears before that state existed.
 
 To regenerate `public/data/`, download the raw `world_*.geojson` files into `data-raw/` and run `npm run data` (about 2 minutes). `npm run data:plates` rebuilds only the plate data (it downloads the model on first run); `npm run data:dinos` rebuilds the dinosaur finds (after the plate data).
 
