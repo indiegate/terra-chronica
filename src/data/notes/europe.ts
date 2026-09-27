@@ -14,7 +14,7 @@ export const notes: CivInput[] = [
   { id: 'hellenistic-kingdoms', name: 'Hellenistic kingdoms', start: -323, end: -30, peak: -250, region: 'Aegean', areas: ['Europe', 'Near East'],
     capitals: [['Pella', 22.52, 40.76, -306, -168]], place: [22.52, 40.76],
     match: ['Kingdom of Antigonus', 'Kingdom of Kassander', 'Kingdom of Lysimachus', 'Macedon and Hellenic League', 'Anatolian and Armenian kingdoms', 'Atropatene', 'Cappadocia', 'Crete', 'Bithynia', 'Pergamon'],
-    summary: 'The kingdoms carved from Alexander’s empire by his generals, among them Antigonus, Cassander and Lysimachus, and the later Antigonid Macedon, Attalid Pergamon, Pontus, Bithynia, Cappadocia and Armenia. Rome absorbed them one by one between 168 and 30 BC.' },
+    summary: 'The kingdoms carved from Alexander’s empire by his generals, among them Antigonus, Cassander and Lysimachus, and the later Antigonid Macedon, Attalid Pergamon, Pontus, Bithynia, Cappadocia and Armenia. Rome absorbed most of them between 168 and 30 BC (Cappadocia in AD 17; Armenia remained a contested buffer).' },
 
   // ── Migration period ───────────────────────────────────────────────────
   { id: 'huns', name: 'Huns', start: 370, end: 469, peak: 445, region: 'Steppe', areas: ['Steppe & Central Asia', 'Europe'],
@@ -47,7 +47,7 @@ export const notes: CivInput[] = [
     capitals: [['Roskilde', 12.08, 55.64, 980, 1443], ['Copenhagen', 12.57, 55.68, 1443, 2010]], match: ['Denmark', 'Denmark-Norway', 'Kalmar Union', 'Schleswig'],
     summary: 'The kingdom of Gorm and Harald Bluetooth, who converted to Christianity around 965. Under Margaret I the Kalmar Union (1397) joined all Scandinavia; Denmark–Norway lasted until 1814 and kept Iceland, the Faroes and Greenland.' },
   { id: 'sweden', name: 'Sweden', start: 970, end: 2010, peak: 1658, region: 'Northern Europe',
-    capitals: [['Stockholm', 18.07, 59.33]], match: ['Sweden', 'Sweden–Norway'],
+    capitals: [['Uppsala', 17.64, 59.86, 970, 1250], ['Stockholm', 18.07, 59.33, 1250, 2010]], match: ['Sweden', 'Sweden–Norway'],
     summary: 'A Christian kingdom from the reign of Olof Skötkonung (about 995), Sweden joined the Kalmar Union in 1397; Gustav Vasa broke it away from the Kalmar Union in 1523. In the 17th century it became a great power around the Baltic, until defeat by Russia in the Great Northern War (1700–21). In union with Norway from 1814 to 1905, it stayed neutral in both world wars.' },
   { id: 'russian-principalities', name: 'Novgorod, Ryazan & Muscovy', start: 1054, end: 1547, peak: 1480, region: 'Eastern Europe',
     capitals: [['Moscow', 37.62, 55.76, 1283, 1547]], place: [31.27, 58.52],

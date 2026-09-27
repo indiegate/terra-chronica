@@ -27,7 +27,7 @@ export const notes: CivInput[] = [
     summary: 'Turkic nomad confederations of the western steppe. The Oghuz produced the Seljuks; the Pechenegs raided Rus’ and Byzantium; the Cumans (Kipchaks) dominated the steppe from the Danube to the Irtysh until the Mongols scattered them in 1237–40.' },
   { id: 'karakhanids', name: 'Karluks & Karakhanids', start: 650, end: 1212, peak: 1040, region: 'Central Asia',
     capitals: [['Balasagun', 75.26, 42.75, 940, 1137], ['Samarkand', 66.97, 39.65, 1040, 1212]], match: ['Karluks', 'Karkhanids'],
-    summary: 'A Turkic dynasty descended from the Karluk confederation, the first Turkic rulers to convert to Islam (about 934). They took Bukhara from the Samanids in 999, and the Uyghur dictionary of Mahmud al-Kashgari was written at their court.' },
+    summary: 'A Turkic dynasty descended from the Karluk confederation, the first Turkic rulers to convert to Islam (about 934). They took Bukhara from the Samanids in 999; Mahmud al-Kashgari, a member of the dynasty, compiled his dictionary of the Turkic languages in Baghdad in the 1070s.' },
   { id: 'samanids', name: 'Samanid Empire', start: 819, end: 999, peak: 900, region: 'Central Asia', areas: ['Steppe & Central Asia', 'Iran'],
     capitals: [['Bukhara', 64.42, 39.77]], match: ['Samanid Empire'],
     summary: 'A Persian dynasty ruling from Bukhara, under whom New Persian became a literary language: Rudaki wrote and Firdausi began the Shahnameh. Bukhara was a centre of scholarship, home of the young Avicenna.' },

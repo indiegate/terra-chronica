@@ -74,7 +74,7 @@ export const notes: CivInput[] = [
     summary: 'Barangay communities and polities such as Tondo, Maynila, Cebu and the sultanates of Sulu and Maguindanao, trading with China and the Malay world. The Laguna Copperplate (900) is the oldest known Philippine document.' },
   { id: 'png-colonial', name: 'Colonial New Guinea & Papua New Guinea', start: 1884, end: 2010, peak: 1975, region: 'Oceania',
     capitals: [['Port Moresby', 147.18, -9.44]], match: ['Territory of Papua and New Guinea', 'Papua New Guinea'],
-    summary: 'Divided in 1884 between Germany, Britain and the Netherlands. Australia took over British Papua in 1906 and German New Guinea in 1914; the two territories were joined after 1945 and became independent as Papua New Guinea in 1975.' },
+    summary: 'Western New Guinea had been Dutch since 1828; in 1884 Germany and Britain divided the east. Australia took over British Papua in 1906 and German New Guinea in 1914; the two territories were joined after 1945 and became independent as Papua New Guinea in 1975.' },
   { id: 'british-burma', name: 'British Burma', start: 1824, end: 1948, peak: 1930, region: 'Southeast Asia',
     capitals: [['Rangoon', 96.16, 16.87]], match: ['Burma'],
     summary: 'Britain took Burma in three wars (1824–85) and ruled it as a province of India until 1937. Japan occupied it in 1942–45; it became independent in 1948.' },

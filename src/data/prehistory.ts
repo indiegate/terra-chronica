@@ -147,7 +147,7 @@ export const SITES: Site[] = [
   { name: 'Taung', lon: 24.8, lat: -27.6, from: 2_800_000, to: 2_500_000, species: 'australopith',
     summary: 'The “Taung Child” (Australopithecus africanus), the first australopith ever described, in 1925.' },
   { name: 'Gona', lon: 40.4, lat: 11.05, from: 2_600_000, to: 2_500_000, species: 'early-homo',
-    summary: 'The oldest Oldowan tools: flakes struck from cobbles to cut meat and work wood.' },
+    summary: 'Among the oldest Oldowan tools: flakes struck from cobbles to cut meat and work wood.' },
   { name: 'Drimolen', lon: 27.75, lat: -25.97, from: 2_040_000, to: 1_950_000, species: 'erectus',
     summary: 'The oldest known Homo erectus skull, living alongside Paranthropus robustus.' },
   { name: 'Koobi Fora', lon: 36.2, lat: 3.9, from: 1_950_000, to: 1_500_000, species: 'early-homo',
@@ -346,7 +346,7 @@ export const ROUTES: Route[] = [
   {
     id: 'erectus-out', name: 'First hominins out of Africa', species: 'erectus',
     note: 'Early Homo left Africa more than 2 million years ago, reaching China and the Caucasus. The exact route and species are unknown.',
-    path: [[36.2, 3.9, 2_250_000], [38, 14, 2_220_000], [35.5, 31, 2_200_000], [44.3, 41.3, 2_170_000], [70, 38, 2_150_000], [95, 36, 2_130_000], [109.4, 34.1, 2_120_000]],
+    path: [[36.2, 3.9, 2_250_000], [38, 14, 2_220_000], [35.5, 31, 2_200_000], [50, 36, 2_170_000], [70, 38, 2_150_000], [95, 36, 2_130_000], [109.4, 34.1, 2_120_000]],
   },
   {
     id: 'erectus-java', name: 'Homo erectus reaches Java', species: 'erectus',

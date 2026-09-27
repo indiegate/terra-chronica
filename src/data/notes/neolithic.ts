@@ -17,7 +17,7 @@ export const notes: CivInput[] = [
   { id: 'mesolithic-south-asia', name: 'Mesolithic South Asia', start: -10000, end: -4000, peak: -7000, region: 'South Asia',
     capitals: [], place: [77.61, 22.94], match: [],
     summary: 'Hunter-gatherers with microlithic tools across the subcontinent, who painted the rock shelters of Bhimbetka and buried their dead at sites in the Ganges plain such as Sarai Nahar Rai.' },
-  { id: 'paleo-indians', name: 'Paleo-Indians', start: -10000, end: -8000, peak: -9000, region: 'North America', areas: ['North America', 'Mesoamerica'],
+  { id: 'paleo-indians', name: 'Paleo-Indians', start: -11500, end: -8000, peak: -9000, region: 'North America', areas: ['North America', 'Mesoamerica'],
     capitals: [], place: [-103.33, 34.28], match: [],
     summary: 'The first peoples of the Americas after the Ice Age. Clovis and then Folsom hunters, with their fluted spear points, hunted mammoth, mastodon and giant bison, which died out around this time; others foraged the forests, deserts and coasts from Alaska to the Isthmus.' },
   { id: 'early-arctic', name: 'First Arctic foragers', start: -9500, end: -4000, peak: -7000, region: 'Arctic', areas: ['Arctic', 'Europe'],
@@ -25,9 +25,9 @@ export const notes: CivInput[] = [
     summary: 'As the Ice Age ended, foragers followed the retreating ice into the far north: the Komsa culture on the Arctic coast of Norway from about 9500 BC, and on Zhokhov Island, far off Siberia, polar-bear and reindeer hunters with sled dogs by about 7000 BC.' },
 
   // ── Near East ──────────────────────────────────────────────────────────
-  { id: 'levant-neolithic', name: 'First farmers of the Fertile Crescent', start: -10000, end: -6500, peak: -8000, region: 'Near East',
-    capitals: [], place: [35.44, 31.87], match: ['Levantine Corridor (Neolithic Farmers)', 'Neolithic Farmers'],
-    summary: 'Natufian foragers settled in villages, and their Pre-Pottery Neolithic successors domesticated wheat, barley, lentils, sheep and goats: the world’s first farming. Jericho had a stone wall and tower by about 8000 BC; the carved pillars of Göbekli Tepe are older still.' },
+  { id: 'levant-neolithic', name: 'First farmers of the Fertile Crescent', start: -10000, end: -4500, peak: -8000, region: 'Near East',
+    capitals: [], place: [35.44, 31.87], match: ['Levantine Corridor (Neolithic Farmers)', 'Neolithic Farmers', 'Wadi Rabah culture'],
+    summary: 'Natufian foragers settled in villages, and their Pre-Pottery Neolithic successors domesticated wheat, barley, lentils, sheep and goats: the world’s first farming. Jericho had a stone wall and tower by about 8000 BC; the carved pillars of Göbekli Tepe are older still. Later Pottery Neolithic cultures such as Wadi Rabah (about 5500–4500 BC) led up to the Copper Age.' },
   { id: 'near-east-foragers', name: 'Foragers of the hills and steppes', start: -10000, end: -7000, peak: -9000, region: 'Near East', areas: ['Near East', 'Iran'],
     capitals: [], place: [46.5, 33.5],
     match: ['Coastal and Woodland Mesolithic Hunter-Foragers', 'Steppe Mesolithic Hunter-Foragers', 'Alluvial Lowland Mesolithic Hunter-Foragers', 'Highland Mesolithic Hunter-Foragers'],
@@ -41,8 +41,8 @@ export const notes: CivInput[] = [
   { id: 'susiana', name: 'Susiana culture', start: -6000, end: -3200, peak: -4200, region: 'Iran',
     capitals: [], place: [48.25, 32.19], match: ['Susiana culture'],
     summary: 'Farming villages of the Susiana plain in south-western Iran, related to the Ubaid culture of Mesopotamia. Susa was founded about 4200 BC around a great platform temple; the region became the heartland of Elam.' },
-  { id: 'ghassulian', name: 'Ghassulian culture', start: -5500, end: -3500, peak: -4000, region: 'Near East',
-    capitals: [], place: [35.6, 31.8], match: ['Wadi Rabah culture'],
+  { id: 'ghassulian', name: 'Ghassulian culture', start: -4500, end: -3500, peak: -4000, region: 'Near East',
+    capitals: [], place: [35.6, 31.8], match: [],
     summary: 'Copper Age villages of the southern Levant, famous for wall paintings and the Nahal Mishmar hoard of cast copper sceptres and crowns.' },
 
   // ── Europe ─────────────────────────────────────────────────────────────
@@ -74,7 +74,7 @@ export const notes: CivInput[] = [
     summary: 'In the wetter early Holocene, foragers of West Africa made some of Africa’s oldest pottery (about 9400 BC, at Ounjougou in Mali) and began tending yams and oil palms, in the homeland of the Niger–Congo languages.' },
   { id: 'bantu', name: 'Bantu expansion', start: -3000, end: 1500, peak: -500, region: 'Central Africa', areas: ['West Africa', 'Central & Southern Africa', 'East Africa'],
     capitals: [], place: [10.5, 5.5], match: ['Bantu', 'Bantu peoples'],
-    summary: 'From the Nigeria–Cameroon borderlands, Bantu-speaking farmers spread over three thousand years across Central, Eastern and Southern Africa, bringing farming, iron-working (from about 500 BC) and the languages spoken by about a third of Africans today.' },
+    summary: 'From the Nigeria–Cameroon borderlands, Bantu-speaking farmers spread over three thousand years across Central, Eastern and Southern Africa, bringing farming, iron-working (from about 500 BC) and the languages spoken by about a quarter of Africans today.' },
   { id: 'khoe-san', name: 'Khoe and San peoples', start: -10000, end: 2010, peak: -1000, region: 'Southern Africa',
     capitals: [], place: [21.73, -18.75], match: ['Khoisan'],
     summary: 'The foragers (San) and herders (Khoe) of southern Africa, whose ancestral lineages are among the most deeply divergent in living humans. Their rock paintings span thousands of years; Bantu farmers and later European colonists pushed them into the Kalahari and the Cape.' },
@@ -82,7 +82,7 @@ export const notes: CivInput[] = [
   // ── Asia ───────────────────────────────────────────────────────────────
   { id: 'sundaland-foragers', name: 'Island Southeast Asian foragers', start: -10000, end: -2000, peak: -6000, region: 'Southeast Asia',
     capitals: [], place: [113.78, 3.82], match: ['Island Southeast Asian foragers'],
-    summary: 'Descendants of the first modern humans in the region, who hunted, fished and tended forest plants. As seas rose after the Ice Age they drowned the Sunda shelf, turning hills into the islands of Indonesia and the Philippines. From about 2000 BC Austronesian farmers settled among them.' },
+    summary: 'Descendants of the first modern humans in the region, who hunted, fished and tended forest plants. As seas rose after the Ice Age they drowned the Sunda shelf, turning hills into the islands of western Indonesia: Sumatra, Java and Borneo. From about 2000 BC Austronesian farmers settled among them.' },
   { id: 'neolithic-china', name: 'Neolithic China', start: -10000, end: -2000, peak: -3000, region: 'China',
     capitals: [], place: [113.67, 33.6], match: ['Longshan and southern Neolithic cultures'],
     summary: 'Pottery-making foragers lived in China from the end of the Ice Age. Millet was domesticated along the Yellow River and rice along the Yangtze by about 7000 BC. Villages such as Jiahu (with the oldest playable flutes), Yangshao with its painted pottery, and Hemudu with its pile houses were followed by the jade-working Liangzhu culture, whose walled city (3300–2300 BC) preceded China’s Bronze Age states.' },
@@ -122,7 +122,7 @@ export const events: HistoricEvent[] = [
   { year: -4500, label: 'Varna gold, the oldest worked gold', area: 'Europe' },
   { year: -3500, label: 'The Sahara dries out', area: 'North Africa' },
   { year: -3300, label: 'Liangzhu walled city', area: 'China' },
-  { year: -3000, label: 'Austronesian seafarers set out from Taiwan', area: 'Southeast Asia' },
+  { year: -3000, label: 'Austronesian-speaking farmers settle Taiwan', area: 'Southeast Asia' },
   { year: -2800, label: 'Bantu expansion under way', area: 'Central & Southern Africa' },
   { year: -2500, label: 'Stonehenge’s great sarsen circle', area: 'Europe' },
 ];

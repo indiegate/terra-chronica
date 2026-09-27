@@ -6,7 +6,7 @@ const KYOTO: [string, number, number] = ['Kyoto', 135.76, 35.01];
 
 export const notes: CivInput[] = [
   // ── Japan ──────────────────────────────────────────────────────────────
-  { id: 'jomon', name: 'Jōmon', start: -10000, end: -300, peak: -3000, region: 'Japan',
+  { id: 'jomon', name: 'Jōmon', start: -14000, end: -300, peak: -3000, region: 'Japan',
     capitals: [], place: [140.7, 40.81], match: ['Jōmon', 'Late Jomon culture'],
     summary: 'Hunter-gatherers of the Japanese islands, who made some of the world’s oldest pottery (from about 14,000 BC) and lived in settled villages such as Sannai-Maruyama for thousands of years without farming.' },
   { id: 'yayoi', name: 'Yayoi', start: -900, end: 250, peak: 0, region: 'Japan',

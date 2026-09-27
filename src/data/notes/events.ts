@@ -36,6 +36,7 @@ export const EVENT_GAPS: { area: string; from: number; why: string }[] = [
   { area: 'East Africa', from: -4000, why: 'Early and middle Holocene East Africa is known from undated or broadly dated forager sites; see the note on lakeside foragers and first herders' },
   { area: 'Central & Southern Africa', from: -4000, why: 'Holocene foragers of the Congo basin and southern Africa are known mainly from rock art and broadly dated tool industries; see the Khoe and San and early Central Africa notes' },
   { area: 'Southeast Asia', from: -4000, why: 'Hoabinhian foragers of this period are known from broadly dated cave and shell-midden sites' },
+  { area: 'Oceania', from: -6000, why: 'Aboriginal Australian and New Guinean history of this period is continuous but has few precisely dated single events' },
   { area: 'Oceania', from: -4000, why: 'Aboriginal Australian and New Guinean history of this period is continuous but has few precisely dated single events' },
   { area: 'Arctic', from: -4000, why: 'The Arctic was thinly settled, with few precisely dated sites before the Paleo-Inuit; see the first Arctic foragers note' },
   { area: 'Oceania', from: -3000, why: 'Aboriginal Australian and New Guinean history of this period is continuous but has few precisely dated single events' },
@@ -61,7 +62,7 @@ export const events: HistoricEvent[] = [
   { year: -8200, label: 'Goats herded at Ganj Dareh, in the Zagros', area: 'Iran' },
   { year: -7500, label: 'Farming village at Ali Kosh', area: 'Iran' },
   { year: -6800, label: 'Village of Chogha Mish founded', area: 'Iran' },
-  { year: -5400, label: 'Oldest known wine residues (Hajji Firuz Tepe)', area: 'Iran' },
+  { year: -5400, label: 'Early wine residues (Hajji Firuz Tepe)', area: 'Iran' },
   { year: -4200, label: 'Susa founded', area: 'Iran' },
   { year: -3100, label: 'Proto-Elamite writing at Susa', area: 'Iran' },
   { year: -2700, label: 'Shahr-e Sukhteh, a Bronze Age city in Sistan', area: 'Iran' },
@@ -190,7 +191,7 @@ export const events: HistoricEvent[] = [
   // ── Oceania ────────────────────────────────────────────────────────────
   { year: -10000, label: 'Rising seas cut Tasmania off from the mainland', area: 'Oceania' },
   { year: -8000, label: 'Wooden boomerangs at Wyrie Swamp, South Australia', area: 'Oceania' },
-  { year: -6000, label: 'Rising seas separate New Guinea from Australia', area: 'Oceania' },
+  { year: -6500, label: 'Rising seas separate New Guinea from Australia', area: 'Oceania' },
   { year: -4600, label: 'Budj Bim eel traps, Victoria', area: 'Oceania' },
   { year: -1550, label: 'Austronesian voyagers reach the Mariana Islands', area: 'Oceania' },
   { year: -1350, label: 'Lapita pottery appears in the Bismarck Archipelago', area: 'Oceania' },
@@ -200,7 +201,7 @@ export const events: HistoricEvent[] = [
   { year: 2006, label: 'Military coup in Fiji', area: 'Oceania' },
 
   // ── North America ──────────────────────────────────────────────────────
-  { year: -9500, label: 'Folsom bison hunters on the Great Plains', area: 'North America' },
+  { year: -10000, label: 'Plano bison hunters (Agate Basin) on the Great Plains', area: 'North America' },
   { year: -8600, label: 'Spirit Cave burial, Nevada', area: 'North America' },
   { year: -7500, label: 'Koster site, Illinois, first settled', area: 'North America' },
   { year: -7000, label: 'Kennewick Man buried by the Columbia River', area: 'North America' },

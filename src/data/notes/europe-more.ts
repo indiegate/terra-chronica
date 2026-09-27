@@ -77,7 +77,7 @@ export const notes: CivInput[] = [
     match: ['England', 'English territory', 'England and Ireland', 'Angevin Empire'],
     summary: 'Athelstan united the Anglo-Saxon kingdoms in 927. After the Norman Conquest of 1066 English kings also held great lands in France (the Angevin Empire), lost in the Hundred Years’ War; Wales was conquered in 1282 and Ireland claimed. Union with Scotland in 1707 created Great Britain.' },
   { id: 'rum', name: 'Seljuks of Rum & the Anatolian beyliks', start: 1077, end: 1450, peak: 1230, region: 'Anatolia',
-    capitals: [['Konya', 32.49, 37.87]], match: ['Sultanate of Rum', 'Anatolian beyliks', 'Beylik of Aydin'],
+    capitals: [['Nicaea', 29.72, 40.43, 1077, 1097], ['Konya', 32.49, 37.87, 1097, 1308]], match: ['Sultanate of Rum', 'Anatolian beyliks', 'Beylik of Aydin'],
     summary: 'A Seljuk sultanate in central Anatolia after the victory at Manzikert (1071), with its capital at Konya, where Rumi taught. After the Mongol conquest (1243) it broke into Turkish principalities, the beyliks, of which the Ottomans became the greatest.' },
 
   // ── Modern states ──────────────────────────────────────────────────────

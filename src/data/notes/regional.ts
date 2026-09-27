@@ -90,16 +90,16 @@ export const notes: CivInput[] = [
     summary: 'A coastal kingdom between Bengal and Burma, whose capital Mrauk U grew rich on Bay of Bengal trade and Portuguese mercenaries, until Burma conquered it in 1784.' },
   { id: 'bhutan', name: 'Bhutan & Sikkim', start: 1200, end: 2010, peak: 1650, region: 'South Asia',
     capitals: [['Punakha', 89.86, 27.58, 1637, 1955], ['Thimphu', 89.64, 27.47, 1955, 2010]], place: [89.64, 27.47], match: ['Bhutan', 'Sikkim (Indian princely state)'],
-    summary: 'Buddhist lineages from Tibet spread in the valleys from the 12th century; the lama Zhabdrung Ngawang Namgyal unified Bhutan in 1616. A monarchy since 1907 and a constitutional one since 2008. Neighbouring Sikkim, a Buddhist kingdom from 1642, became an Indian protectorate and joined India in 1975.' },
+    summary: 'Buddhist lineages from Tibet spread in the valleys from the 12th century; the lama Zhabdrung Ngawang Namgyal, arriving from Tibet in 1616, unified Bhutan over the following decades. A monarchy since 1907 and a constitutional one since 2008. Neighbouring Sikkim, a Buddhist kingdom from 1642, became an Indian protectorate and joined India in 1975.' },
   { id: 'hainan', name: 'Hainan', start: -110, end: 1400, peak: 1000, region: 'China',
     capitals: [], place: [109.7, 19.2], match: ['Hainan'],
     summary: 'The tropical island home of the Li people, made a Han commandery in 110 BC but only loosely held for centuries, a place of exile for officials such as the poet Su Shi.' },
   { id: 'taiwan', name: 'Taiwan', start: 1000, end: 2010, peak: 2000, region: 'China', areas: ['China', 'Southeast Asia'],
     capitals: [['Taipei', 121.56, 25.03, 1887, 2010]], place: [121.56, 25.03], match: ['Taiwanese Tribes', 'Taiwan', 'Dutch Formosa', 'Middag Kingdom'],
-    summary: 'Home of Austronesian peoples for five thousand years. The Dutch (1624–62) and Koxinga’s Ming loyalists ruled parts of it before the Qing annexed it in 1683; Japan held it from 1895 to 1945, and the Republic of China has governed it since 1949.' },
+    summary: 'Home of Austronesian peoples for five thousand years. The Dutch (1624–62) and Koxinga’s Ming loyalists ruled parts of it before the Qing annexed it in 1683; Japan held it from 1895 to 1945, and the Republic of China has governed it since 1945, its seat of government since 1949.' },
 
   // ── Africa ─────────────────────────────────────────────────────────────
-  { id: 'funj', name: 'Funj Sultanate', start: 1475, end: 1821, peak: 1650, region: 'Nubia',
+  { id: 'funj', name: 'Funj Sultanate', start: 1504, end: 1821, peak: 1650, region: 'Nubia',
     capitals: [['Sennar', 33.62, 13.55]], match: ['Funj'],
     summary: 'A Muslim sultanate founded at Sennar on the Blue Nile, which destroyed Christian Alodia and ruled the middle Nile until Ottoman Egypt conquered it in 1821.' },
   { id: 'takrur', name: 'Takrur & the Fulbe imamates', start: 900, end: 1896, peak: 1800, region: 'West Africa',
@@ -148,10 +148,10 @@ export const notes: CivInput[] = [
     summary: 'Independent from Spain after 1898 under American tutelage. Fidel Castro’s revolution of 1959 created a communist state allied with the Soviet Union; the Cuban Missile Crisis of 1962 brought the world close to nuclear war.' },
   { id: 'belize', name: 'Belize', start: 1638, end: 2010, peak: 1981, region: 'Mesoamerica',
     capitals: [['Belize City', -88.2, 17.5, 1638, 1970], ['Belmopan', -88.77, 17.25, 1970, 2010]], place: [-88.77, 17.25], match: ['Belize', 'British Honduras', 'Bay of Honduras settlements'],
-    summary: 'British logwood cutters settled the coast from the 17th century; British Honduras became a crown colony in 1862 and independent Belize in 1981.' },
+    summary: 'British logwood cutters settled the coast from the 17th century; British Honduras became a colony in 1862 (a crown colony in 1871) and independent Belize in 1981.' },
   { id: 'melanesia', name: 'Melanesian states', start: -1500, end: 2010, peak: 1980, region: 'Oceania',
     capitals: [['Suva', 178.44, -18.14]], place: [178.44, -18.14], match: ['Fiji', 'Solomon Is.', 'Vanuatu', 'New Caledonia', 'New Hebrides'],
-    summary: 'The islands of Fiji, Vanuatu, the Solomons and New Caledonia, settled by Lapita voyagers from about 1500 BC. Colonised in the 19th century, Fiji (1970), the Solomons (1978) and Vanuatu (1980) became independent; New Caledonia remains French.' },
+    summary: 'The islands of Fiji, Vanuatu, the Solomons and New Caledonia. The Solomons were first settled some 30,000 years ago; Lapita voyagers reached Vanuatu, New Caledonia and Fiji around 1000–900 BC. Colonised in the 19th century, Fiji (1970), the Solomons (1978) and Vanuatu (1980) became independent; New Caledonia remains French.' },
 ];
 
 export const events: HistoricEvent[] = [
@@ -160,7 +160,7 @@ export const events: HistoricEvent[] = [
   { year: 1204, label: 'Fourth Crusade sacks Constantinople', area: 'Europe' },
   { year: 1314, label: 'Battle of Bannockburn', area: 'Europe' },
   { year: 1389, label: 'Battle of Kosovo', area: 'Europe' },
-  { year: 1616, label: 'Zhabdrung unifies Bhutan', area: 'South Asia' },
+  { year: 1616, label: 'Zhabdrung Ngawang Namgyal arrives in Bhutan', area: 'South Asia' },
   { year: 1683, label: 'Qing annex Taiwan', area: 'China' },
   { year: 1787, label: 'Freetown founded for freed slaves', area: 'West Africa' },
   { year: 1804, label: 'Haiti independent after the slave revolution', area: 'Mesoamerica' },
