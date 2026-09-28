@@ -60,6 +60,9 @@ let age = 0;
 let preBP = PRE_START;
 let playing = false;
 let lastFrame = 0;
+/** Unrounded slider position while playing; the shown date is rounded, so
+ *  small per-frame steps would otherwise round back to the same year. */
+let playPos = 0;
 
 // ── Layers ──────────────────────────────────────────────────────────────
 
@@ -239,8 +242,7 @@ function tick(now: number) {
   lastFrame = now;
   // Speed is measured along the slider, scaled by each sector's width, so each
   // sector plays in about the same time whatever share of the slider it has.
-  const bp = currentBP();
-  const p = toPos(bp) + 0.012 * Number(speedSel.value) * sectorWidth(bp) * dt;
+  const p = (playPos += 0.012 * Number(speedSel.value) * sectorWidth(fromPos(playPos)) * dt);
   if (p >= 1) {
     stop();
     void setBP(fromPos(1));
@@ -253,6 +255,7 @@ function tick(now: number) {
 function play() {
   if (mode === 'history' && year >= MAX_YEAR) void setYear(MIN_YEAR);
   playing = true;
+  playPos = toPos(currentBP());
   playBtn.classList.add('playing');
   playBtn.setAttribute('aria-label', 'Pause');
   map.setAnimating(true);
