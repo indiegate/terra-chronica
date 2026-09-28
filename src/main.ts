@@ -1,12 +1,14 @@
 import { MapView, esc, type TerritoryHit } from './map';
 import { Timeline } from './timeline';
 import { bracket, loadManifest, loadNameIndex } from './data/borders';
-import { CIVILISATIONS, ERAS, EVENTS, capitalAt, type Civilisation } from './data/civilisations';
-import { EARTH_AGE, GEO_EVENTS, MAX_AGE, PERIODS, ageParts, formatAge, formatAgeShort, periodAt } from './data/geology';
+import { CIVILISATIONS, EVENTS, capitalAt, eraAt, type Civilisation } from './data/civilisations';
+import { EARTH_AGE, GEO_EVENTS, ageParts, formatAgeShort, periodAt } from './data/geology';
 import { formatSpan, formatYear, inkFor } from './format';
 import { LayersPanel } from './layers/panel';
-import { EPOCHS, PRE_END, PRE_EVENTS, PRE_START, SITES, SPECIES_BY_ID, epochAt, siteState, speciesAt, stageAt, type Site } from './data/prehistory';
-import { FIRST_YEAR, LAST_YEAR, deepTime, historyTime, prehistoryTime } from './time';
+import { PRE_END, PRE_EVENTS, PRE_START, SITES, SPECIES_BY_ID, epochAt, siteState, speciesAt, stageAt, type Site } from './data/prehistory';
+import { SECTORS, TICKS, formatBP, formatBPShort, formatYearsAgo, fromPos, roundBP, sectorOf, sectorWidth, toPos, yearsAgoParts } from './axis';
+import { PeriodPanel } from './period-panel';
+import { FIRST_YEAR, LAST_YEAR, PRESENT, deepTime, historyTime, prehistoryTime } from './time';
 
 const $ = <T extends HTMLElement>(sel: string) => document.querySelector<T>(sel)!;
 
@@ -17,80 +19,28 @@ const map = new MapView($('#map'));
 // Dev-only handle for profiling in the browser console.
 if (import.meta.env.DEV) (window as unknown as { atlas: unknown }).atlas = { map };
 
-// Human history: piecewise scale, recent centuries get more room.
-const historyScale = (() => {
-  const domain = [MIN_YEAR, -3000, -1000, 1, 1000, 1500, 1800, MAX_YEAR];
-  const stops = [0, 0.14, 0.3, 0.46, 0.63, 0.76, 0.88, 1];
-  const interp = (xs: number[], ys: number[], v: number) => {
-    let i = 1;
-    while (i < xs.length - 1 && v > xs[i]) i++;
-    return ys[i - 1] + ((v - xs[i - 1]) / (xs[i] - xs[i - 1])) * (ys[i] - ys[i - 1]);
-  };
-  return { toPos: (y: number) => interp(domain, stops, y), fromPos: (p: number) => interp(stops, domain, p) };
-})();
-
-const timeline = new Timeline($('#timeline'), {
-  ...historyScale,
-  round: (y) => Math.round(y) || 1,
-  bands: ERAS,
-  events: EVENTS.map((e) => ({ value: e.year, label: e.label })),
-  ticks: [-10000, -8000, -6000, -4000, -3000, -2000, -1500, -1000, -500, 1, 500, 1000, 1250, 1500, 1650, 1800, 1900, 2000],
-  format: formatYear,
-  tickFormat: formatYear,
-});
-
-// Deep time: the Earth's first 3.5 billion years (before the plate model) are
-// compressed into the left of the slider; from 1 billion years ago a
-// square-root scale of age, where the Precambrian takes about a quarter and
-// Paleozoic, Mesozoic and Cenozoic share the rest roughly equally.
-const EARLY_W = 0.16;
-const deepline = new Timeline($('#deepline'), {
-  toPos: (a) =>
-    a > MAX_AGE
-      ? (EARLY_W * (EARTH_AGE - Math.min(a, EARTH_AGE))) / (EARTH_AGE - MAX_AGE)
-      : EARLY_W + (1 - EARLY_W) * (1 - Math.sqrt(Math.max(0, a) / MAX_AGE)),
-  fromPos: (p) =>
-    p < EARLY_W
-      ? EARTH_AGE - (p / EARLY_W) * (EARTH_AGE - MAX_AGE)
-      : MAX_AGE * (1 - (p - EARLY_W) / (1 - EARLY_W)) ** 2,
-  round: (a) => (a >= 1000 ? Math.round(a / 10) * 10 : a >= 10 ? Math.round(a) : a >= 1 ? Math.round(a * 10) / 10 : Math.round(a * 1000) / 1000),
-  bands: PERIODS.map((p) => ({ name: p.name, start: Math.min(p.start, EARTH_AGE), end: p.end, color: `color-mix(in srgb, ${p.color} 40%, #f6eedb)` })),
-  events: GEO_EVENTS,
-  ticks: [4540, 4000, 3000, 2000, 1000, 900, 800, 720, 635, 539, 500, 450, 400, 350, 300, 252, 200, 150, 100, 66, 34, 10, 2.58, 0],
-  format: formatAge,
-  tickFormat: formatAgeShort,
-});
-
-// Prehistory: log scale of years before present, from the first hominins to 10,000 BC.
-const LOG_START = Math.log(PRE_START);
-const LOG_END = Math.log(PRE_END);
+// One slider for all of time, in years before present (see axis.ts): deep time,
+// prehistory and history as three sectors, each keeping its own scale.
 const clampBP = (bp: number) => Math.max(PRE_END, Math.min(PRE_START, bp));
 
-/** A number of years ago, split into number and unit for the date read-out. */
-function yearsAgoParts(bp: number): [string, string] {
-  if (bp >= 1e6) return [(bp / 1e6).toFixed(2).replace(/\.?0+$/, ''), 'million years ago'];
-  const step = bp >= 100_000 ? 1000 : 100;
-  return [(Math.round(bp / step) * step).toLocaleString('en-GB'), 'years ago'];
-}
-const formatYearsAgo = (bp: number) => (bp <= PRE_END ? '10,000 BC' : yearsAgoParts(bp).join(' '));
-
-const preline = new Timeline($('#preline'), {
-  toPos: (bp) => (LOG_START - Math.log(clampBP(bp))) / (LOG_START - LOG_END),
-  fromPos: (p) => clampBP(Math.exp(LOG_START - p * (LOG_START - LOG_END))),
-  round: (bp) => {
-    const step = bp >= 1e6 ? 10_000 : bp >= 100_000 ? 1000 : bp >= 20_000 ? 100 : 50;
-    return clampBP(Math.round(bp / step) * step);
-  },
-  bands: EPOCHS.map((e) => ({ ...e, color: `color-mix(in srgb, ${e.color} 40%, #f6eedb)` })),
-  events: PRE_EVENTS,
-  ticks: [7e6, 5e6, 3e6, 2e6, 1e6, 500e3, 300e3, 200e3, 100e3, 50e3, 30e3, 20e3, PRE_END],
-  format: formatYearsAgo,
-  tickFormat: (bp) => (bp >= 1e6 ? `${bp / 1e6} Ma` : `${Math.round(bp / 1000)} ka`),
+const timeline = new Timeline($('#timeline'), {
+  toPos,
+  fromPos,
+  round: roundBP,
+  sectors: SECTORS.map((s) => ({ name: s.name, start: s.from, end: s.to })),
+  events: [
+    // Geological events after 7 million years ago are covered by prehistory’s own.
+    ...GEO_EVENTS.filter((e) => e.value * 1e6 > PRE_START).map((e) => ({ value: e.value * 1e6, label: e.label })),
+    ...PRE_EVENTS,
+    ...EVENTS.map((e) => ({ value: PRESENT - e.year, label: e.label })),
+  ],
+  ticks: TICKS,
+  format: formatBP,
+  tickFormat: formatBPShort,
 });
 
-const deeplineEl = $('#deepline');
-const prelineEl = $('#preline');
-const timelineEl = $('#timeline');
+const periodPanel = new PeriodPanel($('#period'));
+
 const yearEl = $('#year');
 const eraEl = $('#era');
 const surveyEl = $('#survey');
@@ -98,7 +48,7 @@ const playBtn = $<HTMLButtonElement>('#play');
 const speedSel = $<HTMLSelectElement>('#speed');
 const info = $('#info');
 
-/** Which slider is in charge. */
+/** Which sector of the slider the date is in. */
 type Mode = 'deep' | 'pre' | 'history';
 
 let snapshots: number[] = [];
@@ -178,7 +128,7 @@ function writeHash() {
   history.replaceState(null, '', `#${time}${layers !== null ? `&layers=${layers}` : ''}`);
 }
 
-/** Hand control to one slider; the others dim. Leaving deep time or prehistory restores the borders. */
+/** Switch sector. Leaving deep time or prehistory restores the borders. */
 function enterMode(m: Mode) {
   if (mode === m) return;
   const wasGeo = mode !== 'history';
@@ -190,12 +140,37 @@ function enterMode(m: Mode) {
   if (m === 'history' && wasGeo) void map.setGeoAge(0);
 }
 
-/** Keep every slider's handle on the same moment, as far as its range allows. */
+/** The current date in years before present. */
+function currentBP() {
+  return mode === 'deep' ? age * 1e6 : mode === 'pre' ? preBP : PRESENT - year;
+}
+
+/** Go to a date in years before present, in whichever sector it falls. */
+function setBP(bp: number) {
+  const s = sectorOf(bp);
+  return s === 'deep' ? setAge(bp / 1e6) : s === 'pre' ? setPre(bp) : setYear(PRESENT - bp);
+}
+
+/** Move the slider handle and the period card to the current date. */
 function syncHandles() {
-  deepline.setValue(mode === 'deep' ? age : mode === 'pre' ? preBP / 1e6 : 0);
-  preline.setValue(mode === 'pre' ? preBP : mode === 'deep' ? clampBP(age * 1e6) : PRE_END);
-  timeline.setValue(mode === 'history' ? year : MIN_YEAR);
-  for (const [el, m] of [[deeplineEl, 'deep'], [prelineEl, 'pre'], [timelineEl, 'history']] as const) el.classList.toggle('active', m === mode);
+  timeline.setValue(currentBP());
+  if (mode === 'deep') {
+    const p = periodAt(age);
+    periodPanel.show({
+      key: `period:${p.name}`, name: p.name, kind: `${p.era} ${p.rank ?? 'era'} · period`,
+      span: `${formatAgeShort(Math.min(p.start, EARTH_AGE))} – ${formatAgeShort(p.end)}`, summary: p.summary, color: p.color,
+    });
+  } else if (mode === 'pre') {
+    const e = epochAt(preBP);
+    const st = stageAt(preBP);
+    periodPanel.show({
+      key: `epoch:${e.name}:${st.name}`, name: e.name, kind: 'Epoch', span: spanAgo(e.start, e.end), summary: e.summary,
+      note: `Stone tools: ${st.name}`, color: e.color,
+    });
+  } else {
+    const e = eraAt(year);
+    periodPanel.show({ key: `era:${e.name}`, name: e.name, kind: 'Era', span: formatSpan(e.start, Math.min(e.end, LAST_YEAR)), summary: e.summary, color: '#c9a45a' });
+  }
 }
 
 async function setYear(y: number) {
@@ -203,8 +178,7 @@ async function setYear(y: number) {
   year = Math.round(y) || 1;
   syncHandles();
   yearEl.textContent = formatYear(year);
-  const era = ERAS.find((e) => year >= e.start && year < e.end) ?? ERAS[ERAS.length - 1];
-  eraEl.textContent = era.name;
+  eraEl.textContent = eraAt(year).name;
   writeHash();
   layersPanel.setTime(historyTime(year));
   if (!snapshots.length) return;
@@ -225,6 +199,8 @@ async function setYear(y: number) {
 async function setAge(a: number) {
   const next = Math.max(0, Math.min(EARTH_AGE, a));
   if (next <= 0) return setYear(year);
+  // The last 7 million years belong to the prehistory sector.
+  if (next * 1e6 <= PRE_START) return setPre(next * 1e6);
   enterMode('deep');
   age = next;
   syncHandles();
@@ -261,25 +237,16 @@ function tick(now: number) {
   if (!playing) return;
   const dt = Math.min(0.1, (now - lastFrame) / 1000);
   lastFrame = now;
-  // Speed is measured along the slider so every stretch of time gets equal screen time.
-  const rate = 0.012 * Number(speedSel.value);
-  if (mode === 'deep') {
-    const next = deepline.fromPos(deepline.toPos(age) + rate * dt);
-    // Deep time flows on into prehistory, and prehistory into human history.
-    if (next * 1e6 <= PRE_START) void setPre(PRE_START);
-    else void setAge(next);
-  } else if (mode === 'pre') {
-    const p = preline.toPos(preBP) + rate * dt;
-    if (p >= 1) void setYear(MIN_YEAR);
-    else void setPre(preline.fromPos(p));
-  } else {
-    let p = timeline.toPos(year) + rate * dt;
-    if (p >= 1) {
-      p = 1;
-      stop();
-    }
-    void setYear(timeline.fromPos(p));
+  // Speed is measured along the slider, scaled by each sector's width, so each
+  // sector plays in about the same time whatever share of the slider it has.
+  const bp = currentBP();
+  const p = toPos(bp) + 0.012 * Number(speedSel.value) * sectorWidth(bp) * dt;
+  if (p >= 1) {
+    stop();
+    void setBP(fromPos(1));
+    return;
   }
+  void setBP(fromPos(p));
   requestAnimationFrame(tick);
 }
 
@@ -302,11 +269,7 @@ function stop() {
 
 playBtn.addEventListener('click', () => (playing ? stop() : play()));
 timeline.onScrubStart = stop;
-timeline.onChange = (y) => void setYear(y);
-deepline.onScrubStart = stop;
-deepline.onChange = (a) => void setAge(a);
-preline.onScrubStart = stop;
-preline.onChange = (bp) => void setPre(bp);
+timeline.onChange = (bp) => void setBP(bp);
 
 document.addEventListener('keydown', (e) => {
   if ((e.target as HTMLElement).closest('input, select')) return;
@@ -316,16 +279,13 @@ document.addEventListener('keydown', (e) => {
   } else if (e.key === 'ArrowRight' || e.key === 'ArrowLeft') {
     stop();
     const dir = e.key === 'ArrowRight' ? 1 : -1;
-    if (mode === 'deep') {
-      void setAge(deepline.fromPos(deepline.toPos(age) + dir * 0.004));
-    } else if (mode === 'pre') {
-      void setPre(preline.fromPos(preline.toPos(preBP) + dir * 0.004));
-    } else if (e.shiftKey) {
+    if (e.shiftKey && mode === 'history') {
       // Jump to the next / previous surveyed snapshot.
       const next = dir > 0 ? snapshots.find((s) => s > year) : [...snapshots].reverse().find((s) => s < year);
       if (next !== undefined) void setYear(next);
     } else {
-      void setYear(timeline.fromPos(timeline.toPos(year) + dir * 0.004));
+      const bp = currentBP();
+      void setBP(fromPos(toPos(bp) + dir * 0.004 * sectorWidth(bp)));
     }
   } else if (e.key === 'Escape') {
     map.select(null);
@@ -615,7 +575,7 @@ window.addEventListener('hashchange', () => {
 (async () => {
   [snapshots, nameIndex] = await Promise.all([loadManifest(), loadNameIndex()]);
   snapshots = snapshots.filter((y) => y >= MIN_YEAR);
-  timeline.setSnaps(snapshots);
+  timeline.setSnaps(snapshots.map((y) => PRESENT - y));
   // Go straight to the date in the URL (going through human history first would rewrite the URL meanwhile).
   if (urlMode === 'deep') await setAge(age);
   else if (urlMode === 'pre') await setPre(preBP);

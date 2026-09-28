@@ -495,21 +495,65 @@ html, body {
   padding: 3px 4px;
 }
 
-/* Three stacked sliders: geological time, human prehistory, human history.
-   Only one is active; the others are dimmed until touched, their handles kept
-   on the same moment as far as their range allows. */
-.sliders { display: flex; flex-direction: column; gap: 4px; min-width: 0; }
-.sliders > div {
+/* The time slider: deep time, prehistory and history as three sectors. */
+.sliders { display: flex; flex-direction: column; min-width: 0; }
+#timeline {
   position: relative;
-  height: 46px;
+  height: 50px;
   min-width: 0;
   cursor: ew-resize;
   user-select: none;
-  transition: opacity 0.25s;
 }
-.sliders > div:not(.active) { opacity: 0.5; }
-.sliders > div:not(.active) .handle { opacity: 0.4; }
-.sliders > div:hover { opacity: 1; }
+.sector-label {
+  font-family: var(--sc);
+  font-size: 12px;
+  letter-spacing: 0.08em;
+  fill: var(--ink-soft);
+  text-anchor: middle;
+  cursor: pointer;
+}
+.sector-label:hover { fill: var(--rubric); }
+.sector-divider { stroke: var(--ink-soft); stroke-width: 1; stroke-dasharray: 2 2; opacity: 0.6; }
+
+/* Period card: the current period, epoch or era. */
+.period-card {
+  position: absolute;
+  z-index: 5;
+  top: 16px;
+  right: 16px;
+  width: min(300px, calc(100% - 120px));
+  font-family: var(--ui);
+  color: var(--ink);
+  background: rgba(252, 248, 238, 0.94);
+  border-radius: 8px;
+  box-shadow: 0 0 0 1px var(--hairline);
+}
+.period-card:empty { display: none; }
+.period-head {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  width: 100%;
+  padding: 10px 12px;
+  font: inherit;
+  color: inherit;
+  text-align: left;
+  background: none;
+  border: none;
+  cursor: pointer;
+}
+.period-swatch { flex: none; width: 10px; height: 28px; border-radius: 3px; background: color-mix(in srgb, var(--period) 70%, var(--ink) 10%); }
+.period-titles { display: flex; flex-direction: column; min-width: 0; flex: 1; }
+.period-kind { font-size: 11px; letter-spacing: 0.06em; text-transform: uppercase; color: var(--ink-soft); }
+.period-name { font-family: var(--caps); font-weight: 700; font-size: 16px; color: var(--rubric); line-height: 1.2; }
+.period-chevron { flex: none; width: 8px; height: 8px; border-right: 1.5px solid var(--ink-soft); border-bottom: 1.5px solid var(--ink-soft); transform: rotate(-135deg); margin: 4px 4px 0; transition: transform 0.2s; }
+.period-card.collapsed .period-chevron { transform: rotate(45deg); margin-top: -2px; }
+.period-body { padding: 0 14px 12px 32px; font-size: 13px; line-height: 1.45; }
+.period-body p { margin: 4px 0 0; }
+.period-span { font-size: 12px; color: var(--ink-soft); }
+.period-note { margin-top: 6px; font-size: 12px; color: var(--ink-soft); font-style: italic; }
+.period-card.collapsed .period-body { display: none; }
+.period-card.collapsed { width: auto; max-width: min(300px, calc(100% - 120px)); }
 
 .year small {
   font-family: var(--ui);

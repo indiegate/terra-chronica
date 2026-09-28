@@ -7,7 +7,9 @@ export interface TimelineConfig {
   fromPos: (p: number) => number;
   /** Rounding applied while scrubbing. */
   round: (v: number) => number;
-  bands: { name: string; start: number; end: number; color?: string }[];
+  bands?: { name: string; start: number; end: number; color?: string }[];
+  /** Named stretches of the axis, shown as labels with dividers above the track. */
+  sectors?: { name: string; start: number; end: number }[];
   events: { value: number; label: string }[];
   ticks: number[];
   /** Long form for tooltips; short form for tick labels. */
@@ -95,7 +97,7 @@ export class Timeline {
 
     // Bands (eras, or geological periods)
     const bands = this.svg.append('g').attr('class', 'eras');
-    this.cfg.bands.forEach((band, i) => {
+    (this.cfg.bands ?? []).forEach((band, i) => {
       const x0 = Math.min(X(band.start), X(band.end));
       const x1 = Math.max(X(band.start), X(band.end));
       const g = bands.append('g').attr('class', `era era-${i % 2}`).on('click', () => {
@@ -110,6 +112,21 @@ export class Timeline {
         .text(room > band.name.length * 7 + 6 ? band.name : room > 34 ? band.name.slice(0, 4) + '.' : room > 14 ? band.name[0] : '')
         .append('title')
         .text(`${band.name}: ${format(band.start)} – ${format(band.end)}`);
+    });
+
+    // Sectors: a label over each stretch, a divider between them.
+    const sectors = this.svg.append('g').attr('class', 'sectors');
+    (this.cfg.sectors ?? []).forEach((sec, i) => {
+      const x0 = X(sec.start);
+      const x1 = X(sec.end);
+      if (i > 0) sectors.append('line').attr('class', 'sector-divider').attr('x1', x0).attr('x2', x0).attr('y1', bandY).attr('y2', axisY + 4);
+      sectors
+        .append('text')
+        .attr('class', 'sector-label')
+        .attr('x', (x0 + x1) / 2)
+        .attr('y', bandY + bandH / 2 + 3.5)
+        .text(sec.name)
+        .on('click', () => this.pick(this.cfg.round(this.fromPos((this.toPos(sec.start) + this.toPos(sec.end)) / 2))));
     });
 
     // Track

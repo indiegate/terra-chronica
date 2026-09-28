@@ -328,18 +328,40 @@ export function civFor(name: string | null | undefined, year: number): Civilisat
   return byMatch.get(name.trim().toLowerCase())?.find((c) => year >= c.start && year <= c.end);
 }
 
-export interface Era { name: string; start: number; end: number }
+/** World-wide eras of human history, for the period card. */
+export interface Era { name: string; start: number; end: number; summary: string }
 
 export const ERAS: Era[] = [
-  { name: 'Mesolithic', start: -10000, end: -8000 },
-  { name: 'Neolithic', start: -8000, end: -3300 },
-  { name: 'Bronze Age', start: -3300, end: -1200 },
-  { name: 'Iron Age', start: -1200, end: -500 },
-  { name: 'Classical', start: -500, end: 500 },
-  { name: 'Medieval', start: 500, end: 1500 },
-  { name: 'Early Modern', start: 1500, end: 1800 },
-  { name: 'Modern', start: 1800, end: 2010 },
+  { name: 'Early Holocene', start: -10000, end: -8000,
+    summary: 'The Ice Age has ended and seas are rising. People everywhere live by hunting, fishing and gathering, but in the Fertile Crescent the first villages begin to cultivate wild cereals.' },
+  { name: 'First farmers', start: -8000, end: -4000,
+    summary: 'Farming arises independently in several places – the Fertile Crescent, China, New Guinea, Mesoamerica, the Andes – and spreads. Villages grow into towns such as Çatalhöyük; pottery, weaving and copper-working appear.' },
+  { name: 'First cities and writing', start: -4000, end: -3000,
+    summary: 'Cities rise in Mesopotamia, with Uruk the largest; writing is invented in Sumer and Egypt, and the wheel and bronze spread. Elsewhere most people still live in farming villages or as foragers.' },
+  { name: 'Bronze Age', start: -3000, end: -1200,
+    summary: 'The first states and empires: pharaonic Egypt, Akkad and Babylon, the Indus cities, Shang China, Minoan and Mycenaean Greece and Norte Chico in Peru. Around 1200 BC a wave of collapse ends many Bronze Age kingdoms of the eastern Mediterranean.' },
+  { name: 'Iron Age', start: -1200, end: -500,
+    summary: 'Iron tools and weapons spread. Assyria, then Babylon and Persia build large empires; the alphabet spreads from Phoenicia; the Olmec, Zhou China and the kingdoms of India flourish, and new religious and philosophical traditions take shape.' },
+  { name: 'Classical age', start: -500, end: 500,
+    summary: 'Great empires span continents – Persia, Alexander’s successors, Rome, the Maurya and Gupta, Han China – linked by the Silk Roads. Buddhism, Confucianism, Greek philosophy and Christianity spread; Teotihuacan and the Maya rise in the Americas.' },
+  { name: 'Postclassical age', start: 500, end: 1500,
+    summary: 'Islam spreads from Arabia to Spain and India; Tang and Song China lead the world in wealth and technology; the Mongols build the largest land empire in history. Trade links Europe, Africa and Asia; the Aztec and Inca empires rise in the Americas.' },
+  { name: 'Early modern', start: 1500, end: 1800,
+    summary: 'European voyages join the Americas to the rest of the world, with catastrophic epidemics and the Atlantic slave trade. The Ottoman, Safavid, Mughal and Qing empires are at their height; printing, science and global trade transform societies.' },
+  { name: 'Industrial age', start: 1800, end: 1914,
+    summary: 'Industrialisation, railways and steamships reshape the world. Europe and the United States dominate; colonial empires cover most of Africa and Asia; revolutions and independence movements remake the Americas and Europe.' },
+  { name: 'World wars', start: 1914, end: 1945,
+    summary: 'Two world wars kill tens of millions. Empires fall, the Soviet Union and fascist states rise, the Great Depression spreads, and the Holocaust murders six million Jews.' },
+  { name: 'Cold War', start: 1945, end: 1991,
+    summary: 'The United States and the Soviet Union compete for influence under the threat of nuclear war. Almost all colonies win independence; China becomes communist; world population and economies grow faster than ever.' },
+  { name: 'Globalisation', start: 1991, end: 2011,
+    summary: 'After the Soviet Union dissolves, trade, migration and the internet knit the world together; China and India grow rapidly, while terrorism, wars in the Middle East and climate change mark the new century.' },
 ];
+
+/** The era a year falls in (the last one covers AD 2010). */
+export function eraAt(year: number): Era {
+  return ERAS.find((e) => year >= e.start && year < e.end) ?? ERAS[ERAS.length - 1];
+}
 
 export interface HistoricEvent {
   year: number;

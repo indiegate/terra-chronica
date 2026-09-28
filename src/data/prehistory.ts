@@ -14,11 +14,16 @@ export const PRE_END = 11_950;
 
 /** Geological epochs, with International Chronostratigraphic Chart colours. */
 export const EPOCHS = [
-  { name: 'Late Miocene', start: 7_000_000, end: 5_333_000, color: '#FFFF66' },
-  { name: 'Pliocene', start: 5_333_000, end: 2_580_000, color: '#FFFF99' },
-  { name: 'Early Pleistocene', start: 2_580_000, end: 774_000, color: '#FFEDB3' },
-  { name: 'Middle Pleistocene', start: 774_000, end: 129_000, color: '#FFF2C7' },
-  { name: 'Late Pleistocene', start: 129_000, end: PRE_END, color: '#FFF2D3' },
+  { name: 'Late Miocene', start: 7_000_000, end: 5_333_000, color: '#FFFF66',
+    summary: 'Africa’s forests shrink as the climate cools and dries. The human and chimpanzee lineages have just split: the earliest known hominins, such as Sahelanthropus, walk upright at least some of the time.' },
+  { name: 'Pliocene', start: 5_333_000, end: 2_580_000, color: '#FFFF99',
+    summary: 'A warmer world than today. Australopiths such as “Lucy” walk upright across the savannas of East and southern Africa; the first stone tools appear about 3.3 million years ago, and the first members of the genus Homo about 2.8 million.' },
+  { name: 'Early Pleistocene', start: 2_580_000, end: 774_000, color: '#FFEDB3',
+    summary: 'The ice ages begin. Homo erectus, tall and long-legged, makes hand-axes and spreads out of Africa as far as China and Java; fire is tamed by about a million years ago.' },
+  { name: 'Middle Pleistocene', start: 774_000, end: 129_000, color: '#FFF2C7',
+    summary: 'Longer, harsher glacial cycles. Middle Pleistocene Homo gives rise to the Neanderthals in Europe, the Denisovans in Asia and, in Africa about 300,000 years ago, Homo sapiens.' },
+  { name: 'Late Pleistocene', start: 129_000, end: PRE_END, color: '#FFF2D3',
+    summary: 'The last ice age. Homo sapiens spreads from Africa to every continent but Antarctica, making art, ornaments and boats; the Neanderthals, Denisovans and island hominins disappear, and many giant animals die out.' },
 ];
 
 /**
