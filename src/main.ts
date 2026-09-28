@@ -254,7 +254,8 @@ function tick(now: number) {
 }
 
 function play() {
-  if (mode === 'history' && year >= MAX_YEAR) void setYear(MIN_YEAR);
+  // At the end, start over from the Earth's formation.
+  if (mode === 'history' && year >= MAX_YEAR) void setAge(EARTH_AGE);
   playing = true;
   playPos = toPos(currentBP());
   playBtn.classList.add('playing');
