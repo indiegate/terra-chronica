@@ -1,4 +1,4 @@
-# Complete History
+# Terra Chronica
 
 An interactive parchment-style world atlas: the Earth from its formation 4.54 billion years ago, drifting continents from a billion years ago, the first humans, then the peoples, kingdoms and empires of the last 12,000 years (10,000 BC to AD 2010).
 
