@@ -118,7 +118,8 @@ function readHash(): Mode {
   const k = location.hash.match(/ka=([\d.]+)/);
   const y = location.hash.match(/year=(-?\d+)/);
   const l = location.hash.match(/layers=([\w,-]*)/);
-  age = a ? Math.max(0, Math.min(EARTH_AGE, Number(a[1]) || 0)) : 0;
+  // With no date in the URL, open at the very beginning: the Earth forming.
+  age = a ? Math.max(0, Math.min(EARTH_AGE, Number(a[1]) || 0)) : k || y ? 0 : EARTH_AGE;
   if (k) preBP = clampBP((Number(k[1]) || 0) * 1000);
   if (y) year = Math.max(MIN_YEAR, Math.min(MAX_YEAR, Number(y[1]) || 1));
   applyLayers(l ? new Set(l[1].split(',').filter(Boolean)) : null);
