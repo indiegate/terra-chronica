@@ -47,6 +47,21 @@ describe('civilisation notes', () => {
     expect(early).toEqual([]);
   });
 
+  it('give every modern state a note of its own', () => {
+    // Only notes for dependent territories may stand for several polygons.
+    const territories = new Set(['caribbean-colonies', 'pacific-islands', 'hong-kong-macao', 'small-european-states', 'overseas-territories']);
+    const shared: string[] = [];
+    for (const year of [1994, 2000, 2010]) {
+      const byNote = new Map<string, string[]>();
+      for (const [n, years] of Object.entries(names)) {
+        const c = years.includes(year) ? civFor(n, year) : undefined;
+        if (c && !territories.has(c.id)) byNote.set(c.id, [...(byNote.get(c.id) ?? []), n]);
+      }
+      for (const [id, ns] of byNote) if (ns.length > 1) shared.push(`${id} in ${year}: ${ns.join(', ')}`);
+    }
+    expect(shared).toEqual([]);
+  });
+
   it('events fall inside human history', () => {
     for (const e of EVENTS) expect(e.year >= -10000 && e.year <= 2010, e.label).toBe(true);
   });

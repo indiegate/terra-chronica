@@ -316,7 +316,13 @@ export function capitalAt(c: Civilisation, year: number): Capital | undefined {
 }
 
 const byMatch = new Map<string, Civilisation[]>();
-for (const c of CIVILISATIONS) for (const n of c.match) {
+// Names a note lists itself come before those an umbrella note claims, so a
+// state keeps its own note in the years the umbrella also covers its name
+// (the umbrella claims “Jamaica” as a colony, the note from independence).
+const umbrella = UMBRELLA as Record<string, string[]>;
+const listed = CIVILISATIONS.flatMap((c) => c.match.filter((n) => !umbrella[c.id]?.includes(n)).map((n) => [n, c] as const));
+const claimed = CIVILISATIONS.flatMap((c) => (umbrella[c.id] ?? []).map((n) => [n, c] as const));
+for (const [n, c] of [...listed, ...claimed]) {
   // Some source names carry stray spaces; civFor trims the name it looks up, so trim here too.
   const key = n.trim().toLowerCase();
   byMatch.set(key, [...(byMatch.get(key) ?? []), c]);

@@ -69,10 +69,12 @@ export const notes: CivInput[] = [
   { id: 'joseon', name: 'Joseon', start: 1392, end: 1910, peak: 1450, region: 'Korea',
     capitals: [['Hanseong (Seoul)', 126.98, 37.57]], match: ['Korea'],
     summary: 'A Neo-Confucian kingdom that ruled from Hanseong (Seoul) for five centuries. King Sejong’s scholars created the Hangul alphabet in 1443, and Admiral Yi Sun-sin’s turtle ships helped repel Japan’s invasions of 1592–98. It became the Korean Empire in 1897 and was annexed by Japan in 1910.' },
-  { id: 'two-koreas', name: 'North & South Korea', start: 1945, end: 2010, peak: 1988, region: 'Korea',
-    capitals: [['Seoul', 126.98, 37.57], ['Pyongyang', 125.75, 39.02]],
-    match: ['Korea (USSR)', 'Korea (USA)', "Korea, Democratic People's Republic of", 'Korea, Republic of'],
-    summary: 'Freed from Japan in 1945, Korea was divided into Soviet and American zones, which became North and South Korea in 1948. The Korean War (1950–53) ended in an armistice, not peace. The South grew into an industrial democracy; the North into a closed hereditary dictatorship.' },
+  { id: 'north-korea', name: 'North Korea', start: 1945, end: 2010, peak: 1990, region: 'Korea',
+    capitals: [['Pyongyang', 125.75, 39.02]], match: ['Korea (USSR)', "Korea, Democratic People's Republic of"],
+    summary: 'The Soviet occupation zone north of the 38th parallel, where Kim Il-sung founded the Democratic People’s Republic of Korea in 1948. His invasion of the South began the Korean War (1950–53). It became a closed hereditary dictatorship, suffered famine in the 1990s and tested a nuclear weapon in 2006.' },
+  { id: 'south-korea', name: 'South Korea', start: 1945, end: 2010, peak: 1988, region: 'Korea',
+    capitals: [['Seoul', 126.98, 37.57]], match: ['Korea (USA)', 'Korea, Republic of'],
+    summary: 'The American occupation zone became the Republic of Korea in 1948 and survived the Korean War (1950–53), which ended in an armistice, not peace. Under military rulers it industrialised rapidly from the 1960s; after mass protests in 1987 it became a democracy, and it hosted the Olympics in 1988.' },
 ];
 
 export const events: HistoricEvent[] = [
