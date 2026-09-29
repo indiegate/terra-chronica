@@ -15,7 +15,7 @@ npm run umbrella   # regenerate the umbrella notes' polygon lists
 
 ## Using it
 
-- **Map:** scroll or pinch to zoom, drag to pan, click a territory or a ★ capital for details. Use `⌂` to reset the view.
+- **Globe:** drag to turn it, scroll or pinch to zoom, click a territory or a ★ capital for details. Use `⌂` to reset the view. Searching for a realm turns the globe to it.
 - **One time slider, three sectors:** deep time (4.54 billion to 7 million years ago, the first 3.5 billion years compressed at the left) takes a quarter of the slider, human prehistory (7 million years ago to 10,000 BC, on a log scale) a quarter, and human history (10,000 BC to AD 2010) half. Drag the seal, click a sector's name to jump into it, or hover the event marks. `←/→` step through time, `Shift+←/→` jump between border surveys in history, `Space` plays or pauses; playback runs through all three sectors at a similar pace each.
 - **Period card:** the top-right card shows the geological period, prehistoric epoch or historical era of the current date, with a short summary; click its title to collapse it.
 - **Deep time:** continents drift to where their plates were; past continents and oceans are labelled (Gondwana, Pangaea, Tethys…). Click the map for the current geological period.
@@ -47,11 +47,12 @@ Known limits of the source that can't be fixed by renaming: the Holy Roman Empir
 
 ## Rendering
 
-The map is drawn with WebGL2 (`src/gl/`):
+The map is a globe (orthographic view) drawn with WebGL2 (`src/gl/`):
 
-- **Land** is rotated per plate to the current geological age and projected to Natural Earth in the vertex shader. Shapes that cross the map's edge are drawn with ±360° copies and cut at the edge.
-- **Territories** come from the pre-projected snapshot meshes and are drawn to an offscreen buffer, then composited once with shared translucency and a watercolour wobble.
-- **Lines** are screen-space quads, so widths and dashes stay constant at any zoom.
+- **Land** is rotated per plate to the current geological age and turned to the view in the vertex shader. The far hemisphere lies beyond the far clipping plane, so the GPU cuts shapes exactly at the horizon; long edges are subdivided so shapes follow the curve of the globe.
+- **Territories** are stored pre-projected (Natural Earth, metres); the mesh worker unprojects them to lon/lat and joins shapes cut at the antimeridian. They are drawn to an offscreen buffer, then composited once with shared translucency and a watercolour wobble.
+- **Lines** are screen-space quads, so widths and dashes stay constant at any zoom; they are cut at the horizon per fragment.
+- **Sea, limb shading and outline** are drawn per pixel over the globe's disc.
 - **Picking** (hover, click) renders territory ids into a one-pixel buffer.
-- Meshes are triangulated in a Web Worker (`src/gl/mesh.worker.ts`). Labels and capitals are an SVG overlay.
+- Meshes are triangulated in a Web Worker (`src/gl/mesh.worker.ts`). Labels, capitals and the prehistory and deep-time layers are an SVG overlay, projected with d3's orthographic projection and hidden behind the horizon.
 

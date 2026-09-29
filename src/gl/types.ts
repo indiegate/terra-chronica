@@ -21,10 +21,10 @@ export interface TerritoryMeta {
   subjecto: string | null;
   partof: string | null;
   precision: number | null;
-  /** Bounds in projected metres. */
+  /** Bounds in degrees: [west, south, east, north] (west > east when it crosses 180°). */
   bbox: [number, number, number, number];
-  /** Label anchor (projected metres) and area of the largest part (m²). */
-  label: { x: number; y: number; area: number };
+  /** Label anchor (lon/lat) and area of the largest part (m², Natural Earth projection). */
+  label: { lon: number; lat: number; area: number };
 }
 
 interface MeshBuffers {
@@ -32,7 +32,7 @@ interface MeshBuffers {
   /** Per vertex: feature id (territories) or piece id (land). */
   fillIds: Uint32Array;
   fillIndex: Uint32Array;
-  /** Line segments: territories [ax, ay, bx, by, along], land [aLon, aLat, bLon, bLat]. */
+  /** Line segments: territories [aLon, aLat, bLon, bLat, along (m)], land [aLon, aLat, bLon, bLat]. */
   linePos: Float32Array;
   lineIds: Uint32Array;
 }

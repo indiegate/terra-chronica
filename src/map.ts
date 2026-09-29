@@ -1,5 +1,4 @@
 import * as d3 from 'd3';
-import earcut from 'earcut';
 import { CIVILISATIONS, capitalAt, civFor, type Capital, type Civilisation } from './data/civilisations';
 import { inkFor, isPeoples } from './format';
 import { Plates, rotateLonLat, type RotationModel } from './plates';
@@ -15,10 +14,15 @@ import { HomininSites, Journeys, SpeciesRanges } from './layers/prehistory';
 import { PRE_END, type Site } from './data/prehistory';
 
 /*
- * The map is drawn with WebGL (see gl/renderer.ts): land comes from Natural
- * Earth coastlines split by tectonic plate, rotated to the current age in the
- * vertex shader; territories are drawn from pre-projected snapshot meshes.
- * Meshes are built in a worker. Labels and capitals are an SVG overlay.
+ * The map is a globe drawn with WebGL (see gl/renderer.ts): land comes from
+ * Natural Earth coastlines split by tectonic plate, rotated to the current age
+ * in the vertex shader; territories are drawn from snapshot meshes. Meshes are
+ * built in a worker. Labels and capitals are an SVG overlay, projected with
+ * the same orthographic view.
+ *
+ * Dragging turns the globe and zooming scales it. Overlay coordinates are CSS
+ * px at zoom 1 (globe radius `radius()`), and `this.t` scales them about the
+ * centre of the view, as a d3 zoom transform would.
  */
 
 interface LabelItem {
@@ -60,6 +64,9 @@ const THEIA_AGE = 4500;
 
 /** Sphere radius used when pre-projecting the data (metres). */
 const EARTH_RADIUS = 6378137;
+const RAD = Math.PI / 180;
+/** Where the globe faces at first and after a reset: [lon, lat]. */
+const HOME: [number, number] = [20, 20];
 /** Full-detail territory borders from this zoom level. */
 const ZOOM_DETAIL = 4;
 /** Coastline scale by zoom level. */
@@ -84,14 +91,24 @@ export class MapView {
   private capitalRoot: d3.Selection<SVGGElement, unknown, null, undefined>;
   private paleoRoot: d3.Selection<SVGGElement, unknown, null, undefined>;
   private dinos: Dinosaurs;
+  /** The globe's disc (overlay space), for clipping overlays drawn in screen space. */
+  private disc: d3.Selection<SVGCircleElement, unknown, null, undefined>;
   private layers: MapLayer[] = [];
   private time: TimeState = historyTime(1);
   private showBorders = true;
   private lastImpact = 0;
   private tooltip: HTMLDivElement;
-  private projection = d3.geoNaturalEarth1();
+  private projection = d3.geoOrthographic().clipAngle(90);
   private zoom: d3.ZoomBehavior<SVGSVGElement, unknown>;
+  /** Overlay transform for the current zoom (scales about the centre of the view). */
   private t = d3.zoomIdentity;
+  /** The point at the centre of the globe, [lon, lat]. */
+  private centre: [number, number] = [...HOME];
+  private k = 1;
+  /** Last transform from d3.zoom, to turn drags into rotation. */
+  private gesture = d3.zoomIdentity;
+  /** Overlays still to be re-projected after the globe turned. */
+  private turned = false;
   private width = 0;
   private height = 0;
   private snapshots = new Map<number, Snapshot>();
@@ -142,15 +159,17 @@ export class MapView {
       land: rgba(c.land, 1),
       coast: rgba(c.ink, 0.75),
       graticule: rgba(c.inkSoft, 0.35),
-      edge: rgba(c.inkSoft, 0.6),
+      edge: rgba(c.inkSoft, 0.75),
+      shade: rgba(c.ink, 0.28),
     };
-    this.renderer = new Renderer(canvas, sphereGeometry(), palette);
+    this.renderer = new Renderer(canvas, { graticule: graticule() }, palette);
 
     this.svg = d3.select(this.stage).append('svg').attr('class', 'map-svg');
     this.world = this.svg.append('g').attr('class', 'world');
     this.capitalRoot = this.world.append('g').attr('class', 'capitals');
     this.labelRoot = this.world.append('g').attr('class', 'labels');
-    const dinoRoot = this.world.insert('g', '.labels').attr('class', 'dino-root');
+    this.disc = this.svg.append('defs').append('clipPath').attr('id', 'globe-disc').append('circle');
+    const dinoRoot = this.world.insert('g', '.labels').attr('class', 'dino-root').attr('clip-path', 'url(#globe-disc)');
     const prehistoryRoot = this.world.insert('g', '.labels').attr('class', 'prehistory');
     const earlyRoot = this.world.insert('g', ':first-child').attr('class', 'early-root');
     this.paleoRoot = this.world.append('g').attr('class', 'paleo-labels');
@@ -159,7 +178,7 @@ export class MapView {
       dinoRoot,
       host,
       () => this.plates,
-      (lon, lat) => this.projection([lon, lat]) as [number, number] | null,
+      (lon, lat) => this.project(lon, lat),
       () => [this.width, this.height],
       DATA('dinosaurs.json'),
     );
@@ -187,7 +206,7 @@ export class MapView {
       new EarlyEarth({
         svg: this.svg,
         root: earlyRoot,
-        project: (lon, lat) => this.projection([lon, lat]) as [number, number] | null,
+        project: (lon, lat) => this.project(lon, lat),
         geoPath: () => d3.geoPath(this.projection),
         plates: () => this.plates,
       }),
@@ -195,7 +214,7 @@ export class MapView {
     this.addLayer(this.dinos);
     const ctx = {
       root: prehistoryRoot,
-      project: (lon: number, lat: number) => this.projection([lon, lat]) as [number, number] | null,
+      project: (lon: number, lat: number) => this.project(lon, lat),
       geoPath: () => d3.geoPath(this.projection),
     };
     const sites = new HomininSites(ctx);
@@ -212,20 +231,25 @@ export class MapView {
       this.requests.delete(e.data.id);
     };
 
+    // d3.zoom handles the gestures: its scale is the globe's zoom, and its
+    // translation, while dragging, turns the globe.
     this.zoom = d3
       .zoom<SVGSVGElement, unknown>()
       .scaleExtent([1, 48])
-      .on('zoom', (e) => {
-        this.t = e.transform;
-        this.world.attr('transform', e.transform.toString());
-        this.host.style.setProperty('--k', String(this.t.k));
-        this.scaleOverlays();
-        this.setHovered(-1);
-        this.invalidate();
+      .on('start', () => this.host.classList.add('turning'))
+      .on('zoom', (e: d3.D3ZoomEvent<SVGSVGElement, unknown>) => {
+        const T = e.transform;
+        const src = e.sourceEvent as Event | null;
+        if (src && src.type !== 'wheel') {
+          const deg = 1 / (RAD * this.radius() * T.k);
+          this.centre = [wrapLon(this.centre[0] - (T.x - this.gesture.x) * deg), clampLat(this.centre[1] + (T.y - this.gesture.y) * deg)];
+        }
+        this.gesture = T;
+        this.setView(this.centre, T.k);
       })
       .on('end', () => {
-        this.layoutLabels();
-        this.ensureDetail();
+        this.host.classList.remove('turning');
+        this.settle();
       });
     this.svg.call(this.zoom).on('dblclick.zoom', null);
     this.svg.on('click', (e: MouseEvent) => {
@@ -306,33 +330,72 @@ export class MapView {
     this.height = r.height;
     this.renderer.resize(r.width, r.height, Math.min(2, window.devicePixelRatio || 1));
     this.svg.attr('width', r.width).attr('height', r.height);
-    this.projection.fitExtent([[24, 24], [r.width - 24, r.height - 24]], { type: 'Sphere' });
-    this.zoom.translateExtent([[0, 0], [r.width, r.height]]).extent([[0, 0], [r.width, r.height]]);
+    this.zoom.extent([[0, 0], [r.width, r.height]]);
+    this.disc.attr('cx', r.width / 2).attr('cy', r.height / 2).attr('r', this.radius());
+    this.setView(this.centre, this.k);
+    this.settle();
+  }
+
+  /** Globe radius at zoom 1, CSS px. */
+  private radius() {
+    return Math.max(40, Math.min(this.width, this.height) / 2 - 24);
+  }
+
+  /** Turn the globe to face `centre` at zoom `k`. Overlays follow on the next frame. */
+  private setView(centre: [number, number], k: number) {
+    this.centre = centre;
+    this.k = k;
+    const [cx, cy] = [this.width / 2, this.height / 2];
+    this.projection.scale(this.radius()).translate([cx, cy]).rotate([-centre[0], -centre[1]]);
+    this.t = d3.zoomIdentity.translate(cx * (1 - k), cy * (1 - k)).scale(k);
+    this.world.attr('transform', this.t.toString());
+    this.host.style.setProperty('--k', String(k));
+    this.turned = true;
+    this.setHovered(-1);
+    this.invalidate();
+  }
+
+  /** After a gesture or animation: place labels and load the detail the zoom needs. */
+  private settle() {
     for (const snap of this.snapshots.values()) {
       snap.items = this.labelItems(snap.meta);
       this.renderLabels(snap);
     }
-    this.renderCapitals();
     this.layoutLabels();
-    this.renderPaleoLabels();
     this.dinos?.render();
+    this.ensureDetail();
+  }
+
+  /** Re-project the overlays for the current rotation (once per frame at most). */
+  private reproject() {
+    this.turned = false;
+    this.renderCapitals();
+    this.renderPaleoLabels();
     for (const layer of this.layers) layer.resize?.();
-    this.invalidate();
+    this.scaleOverlays();
   }
 
-  /** Projected metres → CSS px at the current zoom. */
+  /** A point on the near side of the globe → CSS px at zoom 1, or null behind the horizon. */
+  private project(lon: number, lat: number): [number, number] | null {
+    if (d3.geoDistance([lon, lat], this.centre) > Math.PI / 2) return null;
+    return this.projection([lon, lat]) as [number, number];
+  }
+
   private view(): View {
-    const s = this.projection.scale() / EARTH_RADIUS;
-    const [tx, ty] = this.projection.translate();
-    const { k, x, y } = this.t;
-    return { a: k * s, bx: k * tx + x, by: k * ty + y, panX: x, panY: y };
-  }
-
-  /** Projected metres → CSS px at k=1 (label and overlay space). */
-  private toPx(mx: number, my: number): [number, number] {
-    const s = this.projection.scale() / EARTH_RADIUS;
-    const [tx, ty] = this.projection.translate();
-    return [tx + s * mx, ty - s * my];
+    const [l, p] = [this.centre[0] * RAD, this.centre[1] * RAD];
+    // Rows: east, north and the view direction at the centre point.
+    const e = [-Math.sin(l), Math.cos(l), 0];
+    const n = [-Math.sin(p) * Math.cos(l), -Math.sin(p) * Math.sin(l), Math.cos(p)];
+    const c = [Math.cos(p) * Math.cos(l), Math.cos(p) * Math.sin(l), Math.sin(p)];
+    const r = this.radius() * this.k;
+    return {
+      rot: new Float32Array([e[0], n[0], c[0], e[1], n[1], c[1], e[2], n[2], c[2]]),
+      cx: this.width / 2,
+      cy: this.height / 2,
+      r,
+      panX: -this.centre[0] * RAD * r,
+      panY: this.centre[1] * RAD * r,
+    };
   }
 
   // ── Drawing ──────────────────────────────────────────────────────────
@@ -343,6 +406,7 @@ export class MapView {
 
   private draw() {
     this.frame = 0;
+    if (this.turned) this.reproject();
     // Hover is resolved at most once per frame, and only after the pointer moved.
     if (this.pointer) {
       this.setHovered(this.pickAt(this.pointer), this.pointer.ev);
@@ -450,7 +514,7 @@ export class MapView {
     this.invalidate();
     if (previous > THEIA_AGE && this.age <= THEIA_AGE && this.age > THEIA_AGE - 20 && performance.now() - this.lastImpact > 5000) {
       this.lastImpact = performance.now();
-      const p = this.projection([0, 0]);
+      const p = this.project(this.centre[0], this.centre[1]);
       if (p) playImpact(this.stage, this.t.applyX(p[0]), this.t.applyY(p[1]));
     }
     if (impact) {
@@ -468,7 +532,6 @@ export class MapView {
   private renderPaleoLabels() {
     const plates = this.plates;
     const active = plates && this.age > 0 ? PALEO_LABELS.filter((l) => this.age <= l.from && this.age >= l.to) : [];
-    const RAD = Math.PI / 180;
     const placed = active.flatMap((l) => {
       // Mean direction of the reconstructed anchors (on the sphere, so it works across ±180°).
       let x = 0, y = 0, z = 0;
@@ -479,7 +542,7 @@ export class MapView {
         z += Math.sin(plat * RAD);
       }
       const s = l.antipode ? -1 : 1;
-      const p = this.projection([(Math.atan2(s * y, s * x)) / RAD, Math.asin((s * z) / Math.hypot(x, y, z)) / RAD]);
+      const p = this.project(Math.atan2(s * y, s * x) / RAD, Math.asin((s * z) / Math.hypot(x, y, z)) / RAD);
       return p ? [{ ...l, x: p[0], y: p[1] }] : [];
     });
     this.paleoRoot
@@ -634,11 +697,13 @@ export class MapView {
     const best = new Map<string, LabelItem>();
     for (const m of meta) {
       if (m.label.area <= 0) continue;
-      const area = m.label.area * s * s;
+      const p = this.project(m.label.lon, m.label.lat);
+      if (!p) continue;
+      // Shapes towards the limb are foreshortened.
+      const area = m.label.area * s * s * Math.cos(d3.geoDistance([m.label.lon, m.label.lat], this.centre));
       const prev = best.get(m.name);
       if (prev && prev.area >= area) continue;
-      const [x, y] = this.toPx(m.label.x, m.label.y);
-      best.set(m.name, { name: m.name, x, y, area });
+      best.set(m.name, { name: m.name, x: p[0], y: p[1], area });
     }
     // States outrank loosely-bounded peoples when labels compete for room.
     const score = (l: LabelItem) => l.area * (isPeoples(l.name) ? 0.3 : 1);
@@ -711,8 +776,8 @@ export class MapView {
         return e;
       });
     g.each((d, i, nodes) => {
-      const p = this.projection([d.cap.lon, d.cap.lat]);
-      d3.select(nodes[i]).attr('data-x', p?.[0] ?? 0).attr('data-y', p?.[1] ?? 0);
+      const p = this.project(d.cap.lon, d.cap.lat);
+      d3.select(nodes[i]).attr('data-x', p?.[0] ?? 0).attr('data-y', p?.[1] ?? 0).classed('behind', !p);
     });
     g.select('text').text((d) => d.cap.name);
     g.select('title').text((d) => `${d.cap.name} — capital of ${d.civ.name}`);
@@ -812,40 +877,73 @@ export class MapView {
     this.invalidate();
   }
 
-  /** Zoom to fit all territories whose names are in `names` on the given snapshot. */
+  /** Turn to and zoom to fit all territories whose names are in `names` on the given snapshot. */
   async focus(names: string[], snapshot: number) {
     const snap = await this.snapshot(snapshot);
     const set = new Set(names);
-    const boxes = snap.meta.filter((m) => set.has(m.name) && isFinite(m.bbox[0])).map((m) => m.bbox);
-    if (!boxes.length) return false;
-    const [x0, y1] = this.toPx(Math.min(...boxes.map((b) => b[0])), Math.min(...boxes.map((b) => b[1])));
-    const [x1, y0] = this.toPx(Math.max(...boxes.map((b) => b[2])), Math.max(...boxes.map((b) => b[3])));
-    this.zoomToBox(x0, y0, x1, y1);
+    const parts = snap.meta.filter((m) => set.has(m.name) && isFinite(m.bbox[1]));
+    if (!parts.length) return false;
+    // Centre on the largest part; fit the extent of all of them.
+    const main = parts.reduce((a, b) => (b.label.area > a.label.area ? b : a));
+    const centre: [number, number] = [main.label.lon, main.label.lat];
+    let extent = 0;
+    for (const m of parts) {
+      const [w, south, e, north] = m.bbox;
+      for (const lon of [w, e, (w + e) / 2 + (w > e ? 180 : 0)])
+        for (const lat of [south, north]) extent = Math.max(extent, d3.geoDistance(centre, [lon, lat]));
+    }
+    this.flyTo(centre, this.fitZoom(extent));
     return true;
   }
 
-  focusPoint(lon: number, lat: number, k = 4) {
-    const p = this.projection([lon, lat]);
-    if (!p) return;
-    const t = d3.zoomIdentity.translate(this.width / 2, this.height / 2).scale(k).translate(-p[0], -p[1]);
-    this.svg.transition().duration(1200).ease(d3.easeCubicInOut).call(this.zoom.transform, t);
+  /** Zoom at which a cap of angular radius `a` (radians) fills most of the view. */
+  private fitZoom(a: number) {
+    const size = 0.4 * Math.min(this.width, this.height);
+    return Math.max(1, Math.min(24, size / (this.radius() * Math.sin(Math.min(a, Math.PI / 2)) || 1)));
   }
 
-  private zoomToBox(x0: number, y0: number, x1: number, y1: number) {
-    const k = Math.max(1, Math.min(24, 0.8 / Math.max((x1 - x0) / this.width, (y1 - y0) / this.height)));
-    const t = d3.zoomIdentity
-      .translate(this.width / 2, this.height / 2)
-      .scale(k)
-      .translate(-(x0 + x1) / 2, -(y0 + y1) / 2);
-    this.svg.transition().duration(1200).ease(d3.easeCubicInOut).call(this.zoom.transform, t);
+  focusPoint(lon: number, lat: number, k = 4) {
+    this.flyTo([lon, lat], k);
   }
 
   zoomBy(f: number) {
-    this.svg.transition().duration(350).call(this.zoom.scaleBy, f);
+    this.flyTo(this.centre, Math.max(1, Math.min(48, this.k * f)), 350);
   }
 
   resetView() {
-    this.svg.transition().duration(900).ease(d3.easeCubicInOut).call(this.zoom.transform, d3.zoomIdentity);
+    this.flyTo([...HOME], 1, 900);
+  }
+
+  /** Animate the globe to face `centre` at zoom `k`. A drag or wheel interrupts it. */
+  private flyTo(centre: [number, number], k: number, duration = 1200) {
+    const from = this.centre;
+    const k0 = this.k;
+    const turn = d3.geoInterpolate(from, centre);
+    this.host.classList.add('turning');
+    this.svg
+      .transition()
+      .duration(duration)
+      .ease(d3.easeCubicInOut)
+      .tween('globe', () => (u: number) => {
+        // Pull back while travelling far, as a camera would (never below the whole globe).
+        const zoom = k0 * Math.pow(k / k0, u);
+        const hop = (d3.geoDistance(from, centre) / Math.PI) * Math.sin(u * Math.PI);
+        this.setView(turn(u), Math.max(Math.min(zoom, 1), zoom * (1 - 0.6 * hop)));
+        this.syncZoom();
+      })
+      // Whatever interrupts a flight (a new flight, a drag) settles the view when it ends.
+      .on('interrupt', () => this.syncZoom())
+      .on('end', () => {
+        this.syncZoom();
+        this.host.classList.remove('turning');
+        this.settle();
+      });
+  }
+
+  /** Tell d3.zoom the current scale, so the next gesture continues from it. */
+  private syncZoom() {
+    this.gesture = d3.zoomIdentity.scale(this.k);
+    this.svg.property('__zoom', this.gesture);
   }
 
   setAnimating(on: boolean) {
@@ -853,52 +951,24 @@ export class MapView {
   }
 }
 
-/**
- * Sphere outline (triangulated, for the sea), its edge, and the 10° graticule,
- * all in projected metres. Built once; the view transform does the rest.
- */
-function sphereGeometry() {
-  const proj = d3.geoNaturalEarth1().scale(EARTH_RADIUS).translate([0, 0]);
-  const polylines = (obj: d3.GeoPermissibleObjects) => {
-    const lines: number[][][] = [];
-    let cur: number[][] = [];
-    const ctx = {
-      moveTo(x: number, y: number) {
-        cur = [[x, -y]];
-        lines.push(cur);
-      },
-      lineTo(x: number, y: number) {
-        cur.push([x, -y]);
-      },
-      closePath() {
-        cur.push([...cur[0]]);
-      },
-      arc() {},
-      rect() {},
-    };
-    d3.geoPath(proj, ctx as unknown as d3.GeoContext)(obj);
-    return lines;
-  };
-  const segments = (lines: number[][][]) => {
-    const out: number[] = [];
-    for (const line of lines) {
-      let along = 0;
-      for (let i = 1; i < line.length; i++) {
-        const [ax, ay] = line[i - 1];
-        const [bx, by] = line[i];
-        out.push(ax, ay, bx, by, along);
-        along += Math.hypot(bx - ax, by - ay);
-      }
+/** The 10° graticule as [aLon, aLat, bLon, bLat, along (m)] segments, 2° apart so they follow the globe. */
+function graticule() {
+  const out: number[] = [];
+  const line = (pts: [number, number][]) => {
+    let along = 0;
+    for (let i = 1; i < pts.length; i++) {
+      const [a, b] = [pts[i - 1], pts[i]];
+      out.push(a[0], a[1], b[0], b[1], along);
+      along += d3.geoDistance(a, b) * EARTH_RADIUS;
     }
-    return new Float32Array(out);
   };
-  const outline = polylines({ type: 'Sphere' })[0];
-  const flat = outline.slice(0, -1).flat();
-  const tris = earcut(flat);
-  const sea = new Float32Array(tris.length * 2);
-  tris.forEach((v, i) => sea.set([flat[v * 2], flat[v * 2 + 1]], i * 2));
-  return { seaTriangles: sea, edge: segments([outline]), graticule: segments(polylines(d3.geoGraticule10())) };
+  for (let lon = -180; lon < 180; lon += 10) line(d3.range(-80, 80.1, 2).map((lat) => [lon, lat]));
+  for (let lat = -80; lat <= 80; lat += 10) line(d3.range(-180, 180.1, 2).map((lon) => [lon, lat]));
+  return new Float32Array(out);
 }
+
+const wrapLon = (lon: number) => ((((lon + 180) % 360) + 360) % 360) - 180;
+const clampLat = (lat: number) => Math.max(-89, Math.min(89, lat));
 
 function parseHex(c: string): number[] {
   const m = c.replace('#', '');

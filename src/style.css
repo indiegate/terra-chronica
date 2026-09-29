@@ -149,7 +149,13 @@ html, body {
 
 .stage { position: absolute; inset: 0; }
 .stage canvas.gl,
-.stage .map-svg { position: absolute; inset: 0; display: block; }
+.stage .map-svg { position: absolute; inset: 0; display: block; cursor: grab; }
+.turning .map-svg { cursor: grabbing; }
+
+/* The far side of the globe. Labels and dinosaur zones are placed once the globe stops turning. */
+.capital.behind { display: none !important; }
+.turning .labels,
+.turning .dinosaurs { visibility: hidden; }
 
 /* Labels and capitals belong to human history; hidden when showing geological ages. */
 .deep-time .labels,

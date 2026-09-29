@@ -1,20 +1,26 @@
-// WebGL2 map renderer. Draws, in order: sea (with engraved waves), graticule,
-// land (plates rotated to the current age), territories (via an offscreen
-// buffer so their translucency is applied once), coastline and sphere edge.
+// WebGL2 globe renderer (orthographic). Draws, in order: sea (with engraved
+// waves), graticule, land (plates rotated to the current age), territories (via
+// an offscreen buffer so their translucency is applied once), coastline, and
+// the shading and outline of the globe.
 import * as S from './shaders';
 import type { LandMesh, TerritoryMesh } from './types';
 
 const TEX_W = 2048;
 
-/** Screen mapping: CSS px = a·x + bx, −a·y + by for projected metres (x, y). */
+/** The globe on screen. */
 export interface View {
-  a: number;
-  bx: number;
-  by: number;
-  /** Map pan in CSS px (for patterns that move with the map). */
+  /** World → view rotation, column-major 3×3 (view x east, y north, z towards the viewer). */
+  rot: Float32Array;
+  /** Centre and radius of the globe, CSS px. */
+  cx: number;
+  cy: number;
+  r: number;
+  /** Offset in CSS px for patterns that move with the globe. */
   panX: number;
   panY: number;
 }
+
+const EARTH = 6378137;
 
 export interface Colours {
   sea: RGBA;
@@ -23,6 +29,7 @@ export interface Colours {
   coast: RGBA;
   graticule: RGBA;
   edge: RGBA;
+  shade: RGBA;
 }
 export type RGBA = [number, number, number, number];
 
@@ -202,8 +209,6 @@ export class Renderer {
   readonly gl: WebGL2RenderingContext;
   private p: Record<string, Program>;
   private dpr = 1;
-  private sea: { vao: WebGLVertexArrayObject; count: number };
-  private edge: { vao: WebGLVertexArrayObject; count: number };
   private graticule: { vao: WebGLVertexArrayObject; count: number };
   private rotTex: WebGLTexture;
   private noise: WebGLTexture;
@@ -214,7 +219,7 @@ export class Renderer {
 
   constructor(
     readonly canvas: HTMLCanvasElement,
-    geo: { seaTriangles: Float32Array; edge: Float32Array; graticule: Float32Array },
+    geo: { graticule: Float32Array },
     private colours: Colours,
   ) {
     const gl = canvas.getContext('webgl2', { antialias: true, alpha: true, premultipliedAlpha: true, preserveDrawingBuffer: false });
@@ -225,7 +230,8 @@ export class Renderer {
     }
     this.samples = Math.min(4, gl.getParameter(gl.MAX_SAMPLES) as number);
     this.p = {
-      sea: program(gl, S.SEA_VS, S.SEA_FS),
+      sea: program(gl, S.SCREEN_VS, S.SEA_FS),
+      limb: program(gl, S.SCREEN_VS, S.LIMB_FS),
       plainLine: program(gl, S.PLAIN_LINE_VS, S.PLAIN_LINE_FS),
       landFill: program(gl, S.LAND_FILL_VS, S.LAND_FILL_FS),
       coast: program(gl, S.COAST_LINE_VS, S.COAST_LINE_FS),
@@ -233,8 +239,6 @@ export class Renderer {
       terrLine: program(gl, S.TERRITORY_LINE_VS, S.TERRITORY_LINE_FS),
       composite: program(gl, S.COMPOSITE_VS, S.COMPOSITE_FS),
     };
-    this.sea = this.staticFill(geo.seaTriangles);
-    this.edge = this.staticLines(geo.edge);
     this.graticule = this.staticLines(geo.graticule);
     this.rotTex = floatTexture(gl, new Float32Array(TEX_W * 4).fill(0).map((_, i) => (i % 4 === 0 ? 1 : 0)), 1);
     this.noise = noiseTexture(gl);
@@ -300,24 +304,20 @@ export class Renderer {
     this.u4('sea', 'uSea', this.colours.sea);
     this.u4('sea', 'uInk', this.colours.seaInk);
     gl.uniform2f(this.p.sea.u.uPan, f.view.panX, f.view.panY);
-    gl.bindVertexArray(this.sea.vao);
-    gl.drawArrays(gl.TRIANGLES, 0, this.sea.count);
+    gl.bindVertexArray(null);
+    gl.drawArrays(gl.TRIANGLES, 0, 3);
 
     // Graticule
     this.plainLines(this.graticule, f.view, this.colours.graticule, 0.5, [2, 5]);
 
     // Land
-    const seams = f.age > 0 ? [-1, 0, 1] : [0];
     for (const { layer, alpha } of f.lands) {
       this.use('landFill', f.view);
       this.plates('landFill', layer, f.age);
       const c = this.colours.land;
       this.u4('landFill', 'uColor', [c[0], c[1], c[2], c[3] * alpha]);
       gl.bindVertexArray(layer.fill);
-      for (const s of seams) {
-        gl.uniform1f(this.p.landFill.u.uShift, s);
-        gl.drawElements(gl.TRIANGLES, layer.fillCount, gl.UNSIGNED_INT, 0);
-      }
+      gl.drawElements(gl.TRIANGLES, layer.fillCount, gl.UNSIGNED_INT, 0);
     }
 
     // Territories → offscreen (multisampled) → resolved texture → composited once.
@@ -355,15 +355,16 @@ export class Renderer {
       this.u4('coast', 'uColor', [c[0], c[1], c[2], c[3] * alpha]);
       gl.uniform1f(this.p.coast.u.uWidth, 0.8);
       gl.bindVertexArray(layer.coast);
-      for (const s of seams) {
-        gl.uniform1f(this.p.coast.u.uShift, s);
-        gl.drawArraysInstanced(gl.TRIANGLE_STRIP, 0, 4, layer.coastCount);
-      }
+      gl.drawArraysInstanced(gl.TRIANGLE_STRIP, 0, 4, layer.coastCount);
     }
 
-    // Sphere edge
-    this.plainLines(this.edge, f.view, this.colours.edge, 0.8, [0, 0]);
+    // Limb shading and outline
+    this.use('limb', f.view);
+    this.u4('limb', 'uShade', this.colours.shade);
+    this.u4('limb', 'uEdge', this.colours.edge);
+    gl.uniform1f(this.p.limb.u.uWidth, 0.9);
     gl.bindVertexArray(null);
+    gl.drawArrays(gl.TRIANGLES, 0, 3);
   }
 
   /** Feature id (draw order) of `layer` at CSS pixel (x, y), or -1. */
@@ -409,7 +410,7 @@ export class Renderer {
     this.use('terrLine', view);
     gl.uniform1i(l.u.uColors, 0);
     gl.uniform1f(l.u.uOpacity, opacity);
-    gl.uniform1f(l.u.uPxPerMetre, view.a);
+    gl.uniform1f(l.u.uPxPerMetre, view.r / EARTH);
     gl.uniform1i(l.u.uDashes, dashes ? 1 : 0);
     gl.bindVertexArray(layer.lines);
     gl.drawArraysInstanced(gl.TRIANGLE_STRIP, 0, 4, layer.lineCount);
@@ -421,7 +422,7 @@ export class Renderer {
     this.use('plainLine', view);
     this.u4('plainLine', 'uColor', colour);
     gl.uniform1f(p.u.uWidth, width);
-    gl.uniform1f(p.u.uPxPerMetre, view.a);
+    gl.uniform1f(p.u.uPxPerMetre, view.r / EARTH);
     gl.uniform2f(p.u.uDash, dash[0], dash[1]);
     gl.bindVertexArray(geo.vao);
     gl.drawArraysInstanced(gl.TRIANGLE_STRIP, 0, 4, geo.count);
@@ -432,11 +433,10 @@ export class Renderer {
     const gl = this.gl;
     const p = this.p[name];
     gl.useProgram(p.prog);
-    const W = gl.drawingBufferWidth / this.dpr;
-    const H = gl.drawingBufferHeight / this.dpr;
-    // clip.x = 2(a·x + bx)/W − 1 ; clip.y = 1 − 2(−a·y + by)/H
-    gl.uniform2f(p.u.uScale, (2 * v.a) / W, (2 * v.a) / H);
-    gl.uniform2f(p.u.uOffset, (2 * v.bx) / W - 1, 1 - (2 * v.by) / H);
+    if (p.u.uRot) gl.uniformMatrix3fv(p.u.uRot, false, v.rot);
+    if (p.u.uCentre) gl.uniform2f(p.u.uCentre, v.cx, v.cy);
+    if (p.u.uRadius) gl.uniform1f(p.u.uRadius, v.r);
+    if (p.u.uCss) gl.uniform2f(p.u.uCss, gl.drawingBufferWidth / this.dpr, gl.drawingBufferHeight / this.dpr);
     if (p.u.uViewport) gl.uniform2f(p.u.uViewport, gl.drawingBufferWidth, gl.drawingBufferHeight);
     if (p.u.uDpr) gl.uniform1f(p.u.uDpr, this.dpr);
   }
@@ -446,7 +446,7 @@ export class Renderer {
     const p = this.p[name];
     gl.activeTexture(gl.TEXTURE1);
     gl.bindTexture(gl.TEXTURE_2D, this.rotTex);
-    gl.uniform1i(p.u.uRot, 1);
+    gl.uniform1i(p.u.uPlates, 1);
     gl.activeTexture(gl.TEXTURE2);
     gl.bindTexture(gl.TEXTURE_2D, land.pieces);
     gl.uniform1i(p.u.uPieces, 2);
@@ -458,21 +458,7 @@ export class Renderer {
     this.gl.uniform4f(this.p[name].u[u], c[0], c[1], c[2], c[3]);
   }
 
-  private staticFill(tris: Float32Array) {
-    const gl = this.gl;
-    const vao = gl.createVertexArray()!;
-    gl.bindVertexArray(vao);
-    const b = gl.createBuffer()!;
-    gl.bindBuffer(gl.ARRAY_BUFFER, b);
-    gl.bufferData(gl.ARRAY_BUFFER, tris, gl.STATIC_DRAW);
-    const loc = gl.getAttribLocation(this.p.sea.prog, 'aPos');
-    gl.enableVertexAttribArray(loc);
-    gl.vertexAttribPointer(loc, 2, gl.FLOAT, false, 0, 0);
-    gl.bindVertexArray(null);
-    return { vao, count: tris.length / 2 };
-  }
-
-  /** Segments as [ax, ay, bx, by, along] (metres). */
+  /** Segments as [aLon, aLat, bLon, bLat, along (metres)]. */
   private staticLines(segs: Float32Array) {
     const gl = this.gl;
     const vao = gl.createVertexArray()!;

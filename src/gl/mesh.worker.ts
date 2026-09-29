@@ -1,6 +1,9 @@
 // Builds GPU meshes off the main thread: triangulated fills and line segments
-// for territory snapshots (pre-projected metres) and plate-split land (lon/lat).
+// for territory snapshots and plate-split land, all in lon/lat for the globe.
+// The territory files are stored pre-projected (Natural Earth, metres), so
+// their coordinates are unprojected here.
 import earcut from 'earcut';
+import { geoNaturalEarth1 } from 'd3';
 import { feature } from 'topojson-client';
 import type { Topology, GeometryCollection } from 'topojson-specification';
 import type { Feature, LineString, MultiLineString, MultiPolygon, Polygon, Position } from 'geojson';
@@ -20,6 +23,16 @@ self.onmessage = async (e: MessageEvent<WorkerRequest & { id: number }>) => {
 
 // ── Territories ─────────────────────────────────────────────────────────
 
+const EARTH = 6378137;
+const RAD = Math.PI / 180;
+const natEarth = geoNaturalEarth1().scale(EARTH).translate([0, 0]);
+const unproject = (p: Position): Position => {
+  const ll = natEarth.invert!([p[0], -p[1]])!;
+  return [ll[0], ll[1]];
+};
+/** Longest triangle edge (degrees) before it is split, so fills follow the curve of the globe. */
+const MAX_TERRITORY_EDGE = 2;
+
 type Terr = Feature<Polygon | MultiPolygon | null, { NAME: string; SUBJECTO: string | null; PARTOF: string | null; BORDERPRECISION: number | null }>;
 
 function territories(topo: Topology, req: TerritoryRequest): TerritoryMesh {
@@ -37,36 +50,51 @@ function territories(topo: Topology, req: TerritoryRequest): TerritoryMesh {
       .map(([i]) => i);
 
   const fill = new Builder();
-  const lines = new SegmentBuilder(5); // ax, ay, bx, by, along
+  const lines = new SegmentBuilder(5); // aLon, aLat, bLon, bLat, along
   const meta: TerritoryMeta[] = [];
   order.forEach((src, id) => {
     const f = all[src];
     const g = f.geometry;
-    const bbox: [number, number, number, number] = [Infinity, Infinity, -Infinity, -Infinity];
-    let label = { x: 0, y: 0, area: -1 };
+    let label = { lon: 0, lat: 0, area: -1 };
+    const lons: number[] = [];
+    let south = Infinity, north = -Infinity;
     if (g) {
       for (const rings of g.type === 'Polygon' ? [g.coordinates] : g.coordinates) {
-        fill.polygon(rings, id);
-        for (const ring of rings) {
+        const geo = unwrap(rings.map((r) => r.map(unproject)));
+        fill.polygon(geo, id, MAX_TERRITORY_EDGE);
+        for (const ring of geo) {
           let along = 0;
           for (let i = 1; i < ring.length; i++) {
-            const [ax, ay] = ring[i - 1];
-            const [bx, by] = ring[i];
-            lines.push(id, ax, ay, bx, by, along);
-            along += Math.hypot(bx - ax, by - ay);
-            if (bx < bbox[0]) bbox[0] = bx;
-            if (by < bbox[1]) bbox[1] = by;
-            if (bx > bbox[2]) bbox[2] = bx;
-            if (by > bbox[3]) bbox[3] = by;
+            const [alon, alat] = ring[i - 1];
+            const [blon, blat] = ring[i];
+            const dx = (blon - alon) * Math.cos(((alat + blat) / 2) * RAD);
+            const len = Math.hypot(dx, blat - alat) * RAD * EARTH;
+            // Shapes are cut at the antimeridian in the source; the cut is not a border.
+            if (!(Math.abs(wrap(alon)) > 179.99 && Math.abs(wrap(blon)) > 179.99)) {
+              // Split long segments so they follow the curve of the globe.
+              const n = Math.max(1, Math.ceil(Math.max(Math.abs(blon - alon), Math.abs(blat - alat)) / MAX_TERRITORY_EDGE));
+              for (let j = 0; j < n; j++) {
+                const t0 = j / n, t1 = (j + 1) / n;
+                lines.push(id, alon + (blon - alon) * t0, alat + (blat - alat) * t0, alon + (blon - alon) * t1, alat + (blat - alat) * t1, along + len * t0);
+              }
+            }
+            along += len;
+            lons.push(wrap(blon));
+            if (blat < south) south = blat;
+            if (blat > north) north = blat;
           }
         }
-        // Label on the largest part.
+        // Label on the largest part (area and centre measured in the projected plane).
         const a = Math.abs(ringArea(rings[0]));
-        if (a > label.area) label = { ...ringCentroid(rings[0]), area: a };
+        if (a > label.area) {
+          const c = ringCentroid(rings[0]);
+          const [lon, lat] = unproject([c.x, c.y]);
+          label = { lon, lat, area: a };
+        }
       }
     }
     const p = f.properties;
-    meta.push({ name: p.NAME, subjecto: p.SUBJECTO, partof: p.PARTOF, precision: p.BORDERPRECISION, bbox, label });
+    meta.push({ name: p.NAME, subjecto: p.SUBJECTO, partof: p.PARTOF, precision: p.BORDERPRECISION, bbox: lonLatBox(lons, south, north), label });
   });
 
   return {
@@ -253,6 +281,52 @@ function ringCentroid(r: Position[]) {
     a += c;
   }
   return a ? { x: x / (3 * a), y: y / (3 * a) } : { x: r[0][0], y: r[0][1] };
+}
+
+const wrap = (lon: number) => ((((lon + 180) % 360) + 360) % 360) - 180;
+
+/**
+ * Make each ring's longitudes continuous, so every step takes the short way
+ * round (the source jumps between +180° and −180° where shapes cross the
+ * antimeridian); holes are shifted next to their outer ring. A ring that
+ * circles a pole cannot be unwrapped and is left as it is.
+ */
+function unwrap(rings: Position[][]): Position[][] {
+  const out = rings.map((ring) => {
+    const r: Position[] = [ring[0]];
+    for (let i = 1; i < ring.length; i++) {
+      let lon = ring[i][0];
+      const prev = r[i - 1][0];
+      while (lon - prev > 180) lon -= 360;
+      while (lon - prev < -180) lon += 360;
+      r.push([lon, ring[i][1]]);
+    }
+    return Math.abs(r[r.length - 1][0] - r[0][0]) > 1 ? ring : r;
+  });
+  const ref = out[0]?.[0]?.[0] ?? 0;
+  return out.map((r, i) => {
+    if (i === 0 || !r.length) return r;
+    const shift = Math.round((ref - r[0][0]) / 360) * 360;
+    return shift ? r.map(([lon, lat]) => [lon + shift, lat]) : r;
+  });
+}
+
+/** [west, south, east, north] of a shape, taking the narrower way round (west > east across 180°). */
+function lonLatBox(lons: number[], south: number, north: number): [number, number, number, number] {
+  if (!lons.length) return [Infinity, Infinity, -Infinity, -Infinity];
+  const sorted = [...lons].sort((a, b) => a - b);
+  // The widest gap between neighbouring longitudes (including across 180°) lies outside the shape.
+  let gap = sorted[0] + 360 - sorted[sorted.length - 1];
+  let west = sorted[0], east = sorted[sorted.length - 1];
+  for (let i = 1; i < sorted.length; i++) {
+    const d = sorted[i] - sorted[i - 1];
+    if (d > gap) {
+      gap = d;
+      west = sorted[i];
+      east = sorted[i - 1];
+    }
+  }
+  return [west, south, east, north];
 }
 
 function bboxCentre(r: Position[]): [number, number] {
