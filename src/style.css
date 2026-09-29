@@ -622,14 +622,18 @@ html, body {
 /* Early Earth, before the plate model (schematic). */
 .early-root { pointer-events: none; }
 .ee-sea { stroke: none; }
-.ee-magma { fill: #000; filter: url(#magma); }
-.ee-land {
-  fill: var(--land);
+/* Cratons: dashed outlines underneath, fills on top, so touching cratons merge. */
+.ee-land-edge {
+  fill: none;
   stroke: var(--ink);
   stroke-opacity: 0.6;
-  stroke-width: 1;
-  stroke-dasharray: 4 3;
+  stroke-width: 2;
+  stroke-dasharray: 8 6;
   vector-effect: non-scaling-stroke;
+}
+.ee-land {
+  fill: var(--land);
+  stroke: none;
   pointer-events: visiblePainted;
 }
 .ee-note { font-family: var(--serif); font-style: italic; fill: var(--ink-soft); text-anchor: middle; }

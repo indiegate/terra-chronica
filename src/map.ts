@@ -91,6 +91,7 @@ export class MapView {
   private capitalRoot: d3.Selection<SVGGElement, unknown, null, undefined>;
   private paleoRoot: d3.Selection<SVGGElement, unknown, null, undefined>;
   private dinos: Dinosaurs;
+  private early: EarlyEarth;
   /** The globe's disc (overlay space), for clipping overlays drawn in screen space. */
   private disc: d3.Selection<SVGCircleElement, unknown, null, undefined>;
   private layers: MapLayer[] = [];
@@ -109,6 +110,8 @@ export class MapView {
   private gesture = d3.zoomIdentity;
   /** Overlays still to be re-projected after the globe turned. */
   private turned = false;
+  /** When the user last turned the globe themselves (ms), so it doesn't follow the land against them. */
+  private userTurned = -Infinity;
   private width = 0;
   private height = 0;
   private snapshots = new Map<number, Snapshot>();
@@ -202,15 +205,14 @@ export class MapView {
         (on) => void this.paleoRoot.classed('layer-off', !on),
       ),
     );
-    this.addLayer(
-      new EarlyEarth({
+    this.early = new EarlyEarth({
         svg: this.svg,
         root: earlyRoot,
         project: (lon, lat) => this.project(lon, lat),
         geoPath: () => d3.geoPath(this.projection),
         plates: () => this.plates,
-      }),
-    );
+      });
+    this.addLayer(this.early);
     this.addLayer(this.dinos);
     const ctx = {
       root: prehistoryRoot,
@@ -236,7 +238,10 @@ export class MapView {
     this.zoom = d3
       .zoom<SVGSVGElement, unknown>()
       .scaleExtent([1, 48])
-      .on('start', () => this.host.classList.add('turning'))
+      .on('start', (e: d3.D3ZoomEvent<SVGSVGElement, unknown>) => {
+        this.host.classList.add('turning');
+        if (e.sourceEvent) this.userTurned = performance.now();
+      })
       .on('zoom', (e: d3.D3ZoomEvent<SVGSVGElement, unknown>) => {
         const T = e.transform;
         const src = e.sourceEvent as Event | null;
@@ -412,6 +417,9 @@ export class MapView {
       this.setHovered(this.pickAt(this.pointer), this.pointer.ev);
       this.pointer = null;
     }
+    // The Hadean magma ocean churns: keep drawing while it shows.
+    const magma = this.early.enabled && this.age > 0 ? EarlyEarth.magma(this.age) : { alpha: 0, heat: 0 };
+    if (magma.alpha > 0) this.invalidate();
     const visible = [...this.snapshots.values()].filter((s) => s.opacity > 0.01).sort((a, b) => a.year - b.year);
     this.renderer.draw({
       view: this.view(),
@@ -419,6 +427,7 @@ export class MapView {
       lands: this.landLayers(),
       territories: this.age > 0 || !this.showBorders ? [] : visible.map((s) => ({ layer: this.tier(s), opacity: s.opacity })),
       dashes: this.t.k >= ZOOM_DASHES,
+      magma: { ...magma, time: performance.now() / 1000 },
     });
   }
 
@@ -506,6 +515,7 @@ export class MapView {
       this.select(null);
     }
     this.renderPaleoLabels();
+    this.followLand();
     // Moving forward in time past the impact (or landing exactly on it) replays it.
     const crossed = previous > IMPACT_AGE && this.age <= IMPACT_AGE && this.age > IMPACT_AGE - 6;
     const impact = (crossed || (this.age === IMPACT_AGE && previous !== IMPACT_AGE)) && performance.now() - this.lastImpact > 5000;
@@ -525,6 +535,21 @@ export class MapView {
         const p = this.dinos.impactPoint();
         if (p) playImpact(this.stage, this.t.applyX(p[0]), this.t.applyY(p[1]));
       });
+    }
+  }
+
+  /**
+   * Before the plate model, keep the gathered land in view: ease towards it
+   * while playing, or fly there if a jump leaves it on the far side.
+   */
+  private followLand() {
+    const land = this.early.landCentre(this.age);
+    if (!land || land.strength < 0.35 || performance.now() - this.userTurned < 5000) return;
+    const away = d3.geoDistance(this.centre, land.centre);
+    if (this.host.classList.contains('animating')) {
+      if (away > 0.01) this.setView(d3.geoInterpolate(this.centre, land.centre)(0.05), this.k);
+    } else if (away > (60 * Math.PI) / 180) {
+      this.flyTo(land.centre, this.k, 900);
     }
   }
 

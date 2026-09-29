@@ -40,6 +40,8 @@ export interface Frame {
   lands: { layer: LandLayer; alpha: number }[];
   territories: { layer: TerritoryLayer; opacity: number }[];
   dashes: boolean;
+  /** The Hadean magma ocean, when it shows: opacity, heat (1 molten … 0 crusted) and time in seconds. */
+  magma?: { alpha: number; heat: number; time: number };
 }
 
 interface Program {
@@ -232,6 +234,7 @@ export class Renderer {
     this.p = {
       sea: program(gl, S.SCREEN_VS, S.SEA_FS),
       limb: program(gl, S.SCREEN_VS, S.LIMB_FS),
+      magma: program(gl, S.SCREEN_VS, S.MAGMA_FS),
       plainLine: program(gl, S.PLAIN_LINE_VS, S.PLAIN_LINE_FS),
       landFill: program(gl, S.LAND_FILL_VS, S.LAND_FILL_FS),
       coast: program(gl, S.COAST_LINE_VS, S.COAST_LINE_FS),
@@ -309,6 +312,17 @@ export class Renderer {
 
     // Graticule
     this.plainLines(this.graticule, f.view, this.colours.graticule, 0.5, [2, 5]);
+
+    // Magma ocean
+    if (f.magma && f.magma.alpha > 0) {
+      const m = this.p.magma;
+      this.use('magma', f.view);
+      gl.uniform1f(m.u.uTime, f.magma.time);
+      gl.uniform1f(m.u.uHeat, f.magma.heat);
+      gl.uniform1f(m.u.uAlpha, f.magma.alpha);
+      gl.bindVertexArray(null);
+      gl.drawArrays(gl.TRIANGLES, 0, 3);
+    }
 
     // Land
     for (const { layer, alpha } of f.lands) {
